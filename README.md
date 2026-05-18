@@ -9,8 +9,14 @@
 [![License](https://img.shields.io/badge/license-AGPL--3.0-rose.svg)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/potatameister/PaperKnife?style=flat&color=rose)](https://github.com/potatameister/PaperKnife/stargazers)
 [![Web App](https://img.shields.io/badge/web-live-emerald.svg)](https://potatameister.github.io/PaperKnife/)
-[![Android App](https://img.shields.io/badge/android-apk-blue.svg)](https://github.com/potatameister/PaperKnife/releases/latest)
+[![Android App](https://img.shields.io/badge/android-apk-blue.svg)](https://github.com/Ankitkumar7217734/PaperKnife/releases/latest)
 [![Twitter](https://img.shields.io/badge/twitter-@potatameister-black?logo=x)](https://x.com/potatameister)
+
+## Download Android APK
+
+[![Download APK](https://img.shields.io/badge/Download-APK%20v1.0.9-brightgreen?style=for-the-badge&logo=android)](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.0.9/paperknife-debug-v1.0.9.apk)
+
+> **Direct link:** https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.0.9/paperknife-debug-v1.0.9.apk
 
 ---
 
@@ -40,7 +46,7 @@ I built **PaperKnife** to solve this. It's a collection of tools that run entire
 
 ### How to use it
 
-*   **On Android:** Download the [latest APK](https://github.com/potatameister/PaperKnife/releases/latest) or get it from:
+*   **On Android:** Download the [latest APK](https://github.com/Ankitkumar7217734/PaperKnife/releases/latest) or get it from:
 
 [<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" height="80" alt="Get it at IzzyOnDroid">](https://apt.izzysoft.de/packages/com.paperknife.app)
 
