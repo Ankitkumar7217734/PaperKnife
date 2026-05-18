@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run build` — `tsc` typecheck then `vite build` into `dist/`.
 - `npm run lint` — **known broken:** the installed ESLint is v9, which requires a flat `eslint.config.js`; the repo carries v8-style config and doesn't have one, so this command currently errors out before running. Don't chase it — rely on `npm run build` (which runs `tsc`) for type/correctness checks. If you fix lint, port the config to flat-config form.
 - `npm run preview` — preview the production build.
-- Android sync after a web build: `npx cap sync android`, then `cd android && ./gradlew assembleRelease`.
+- Android sync after a web build: `npx cap sync android`, then `cd android && ./gradlew assembleDebug` (debug, no signing needed) or `./gradlew assembleRelease` (unsigned, requires external signing).
 - The web GH Pages build is served under a subpath; set `VITE_BASE=/PaperKnife/` (see `.github/workflows/deploy.yml`). Local/Android builds use relative `./` base.
 - The F-Droid "Lite" variant is built by deleting `public/tesseract/` and setting `VITE_DISABLE_OCR=true` before `npm run build` (see `android-release.yml`). This flag must work end-to-end; respect it when adding OCR features.
 
@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 PaperKnife is a privacy-focused **single-page React + TypeScript app** that processes PDFs entirely client-side. The same Vite-built `dist/` is shipped two ways:
 
-1. As a PWA / GitHub Pages site (`vite-plugin-pwa`, hash-routed for static hosting).
+1. As a PWA / GitHub Pages site (hash-routed for static hosting).
 2. Wrapped as an Android app via **Capacitor** (`capacitor.config.ts`, `webDir: 'dist'`).
 
 Because the codebase targets both shells from one source, **`Capacitor.isNativePlatform()`** is the runtime branch used throughout (e.g. `src/utils/pdfHelpers.ts` for file save/share, `src/App.tsx` for default `ViewMode`). Two parallel UI trees exist: `WebView` and `AndroidView` / `AndroidToolsView` / `AndroidHistoryView`, selected by `viewMode` in `App.tsx`. The "Chameleon" dev-only toggle (bottom-right) flips between them in dev builds.
@@ -27,8 +27,18 @@ Because the codebase targets both shells from one source, **`Capacitor.isNativeP
 
 - The `tools` array (and exported `activeTools`, filtered by `IS_OCR_DISABLED`) drives the home grids, the QuickDrop modal, and the Android tools view. Adding a tool means: add to `tools`, add a `<Route>`, and create a component under `src/components/tools/`.
 - Routes are `HashRouter`-based (required for static hosting under a subpath and for Capacitor's `file://` scheme).
-- Tool components are statically imported (not lazy), intentionally — the comment in `App.tsx` notes that dynamic imports break in the Android APK shell.
+- Tool components are statically imported (not lazy), intentionally — dynamic imports break in the Android APK shell.
 - Not every tool is PDF-in/PDF-out. `CompressImageTool` accepts and emits images (`image/jpeg|png|webp`). When you add a non-PDF tool, set `showPreview={false}` on `SuccessState` (the built-in preview is a `PdfPreview`), and rely on the shared mime-from-filename derivation (see Save/share below).
+
+### Tool component anatomy
+
+Every tool page follows the same shell:
+
+- **Web**: wrapped by `<Layout>` (from the router), uses `<ToolHeader>` for the page title/description.
+- **Android**: wrapped by `<NativeToolLayout>` which renders a native-style sticky AppBar with a back button on mobile, and falls back to `<ToolHeader>` on desktop. Pass `actions` prop for a fixed bottom action bar.
+- Both shells delegate final output to **`<SuccessState>`** (`src/components/tools/shared/SuccessState.tsx`) for download/share/pipeline/preview.
+
+To access `viewMode` inside a deeply nested component without prop drilling, use `useViewMode()` from `src/utils/viewModeContext.tsx`.
 
 ### File pipeline between tools
 
@@ -38,7 +48,7 @@ Because the codebase targets both shells from one source, **`Capacitor.isNativeP
 
 - Heavy work happens in `src/utils/pdfWorker.ts`, a Web Worker that handles `MERGE_PDFS`, `SPLIT_PDF`, and `COMPRESS_PDF_ASSEMBLY`. The worker uses `pdf-lib` only; canvas rasterization (for compress) is done on the main thread before posting `imageBytes` into the worker, because OffscreenCanvas isn't reliable across all targets.
 - `pdfjs-dist` is used for rendering/previews; `pdfHelpers.ts` wires its worker via `?url` import and sets `cMapUrl` differently for web vs. Capacitor.
-- `tesseract.js` powers `PdfToTextTool` OCR. Tesseract WASM/traineddata is fetched into `public/tesseract/` at CI build time, not committed.
+- `tesseract.js` powers `PdfToTextTool` OCR. Tesseract WASM/traineddata is fetched into `public/tesseract/` at CI build time, not committed. The `IS_OCR_DISABLED` export in `App.tsx` (driven by `VITE_DISABLE_OCR`) gates both the route and the tool card.
 - `vite.config.ts` `manualChunks` splits `pdf-lib`, `pdfjs-dist`, `tesseract.js`, and vendor UI libs into separate chunks — keep new heavy deps out of the main bundle by adding them here.
 
 ### Save / share abstraction
@@ -47,14 +57,48 @@ Never use raw `<a download>` or browser blob downloads directly. Use `downloadFi
 
 Most tools delegate download/share/preview to the shared `SuccessState` component (`src/components/tools/shared/SuccessState.tsx`). It derives the MIME type via a local `mimeFromName(fileName)` helper (zip/png/jpg/jpeg/webp/gif/txt → matching MIME; default `application/pdf`). **Set the correct extension on the `fileName` you pass in** — there is no `mimeType` prop. If you add a new output format, extend `mimeFromName`.
 
+When creating blob URLs (e.g. for in-page previews), use the `useObjectURL()` hook from `src/utils/useObjectURL.ts` — it tracks and revokes URLs on unmount to prevent memory leaks.
+
 ### Android "Open With" / share intents
 
 `src/App.tsx` listens for a `fileIntent` window event (dispatched by the Android shell) and reads the URI via `Filesystem.readFile`. There's also a global `open-quick-drop` window event used as a cross-component trigger to surface the QuickDrop modal. Prefer these events over prop drilling when a deep component needs to hand a file to the root.
+
+### Storage layer
+
+Two separate IndexedDB databases coexist:
+
+- **`PaperKnifeWorkspace`** (`src/utils/workspacePersistence.ts`) — stores heavy `Uint8Array` file buffers + tool state so work survives a page refresh ("Privacy Vault"). API: `saveWorkspace(toolId, files)` / `getWorkspace(toolId)` / `clearWorkspace(toolId)`.
+- **`PaperKnifeDB`** (`src/utils/recentActivity.ts`) — stores the activity log (file name, tool, timestamp, size). `clearActivity()` is called by the auto-wipe logic in `App.tsx`.
+
+**localStorage keys** (complete map):
+
+| Key | Type | Purpose |
+|---|---|---|
+| `theme` | `'light'\|'dark'\|'system'` | UI theme |
+| `autoWipe` | `'true'\|'false'` | Enable inactivity wipe |
+| `autoWipeTimer` | number (minutes) | Wipe timeout, default `15` |
+| `hapticsEnabled` | `'true'\|'false'` | Android haptic feedback |
+| `autoDownload` | `'true'\|'false'` | Auto-trigger download on success |
+| `historyLimit` | number string | Max activity entries, `'999'` = unlimited |
+| `defaultAuthor` | string | Pre-fills author/creator in MetadataTool |
+| `lastSeen` | timestamp ms | Used by auto-wipe idle detection |
+
+### Haptics
+
+`src/utils/haptics.ts` exposes `hapticImpact()`, `hapticSuccess()`, `hapticSelection()`. All three are no-ops on web and when `hapticsEnabled` is not `'true'` in localStorage. Call them on significant user interactions inside Android tool flows.
 
 ### Theming, view mode, privacy auto-wipe
 
 - Theme is `light | dark | system`, persisted in `localStorage` (`theme`), with a media-query listener for `system`.
 - `autoWipe` + `autoWipeTimer` localStorage keys drive the inactivity wipe in `App.tsx` (calls `clearActivity()` from `recentActivity.ts`). Don't write user-data persistence that bypasses this — privacy is the product.
+
+### Android CI pipeline
+
+`.github/workflows/android-release.yml` runs on every push to `main`:
+1. Builds web assets (with OCR binaries fetched from unpkg).
+2. Runs `npx cap sync android` to populate `android/app/src/main/assets/public/` (this dir is gitignored).
+3. Builds a **debug APK** (`assembleDebug`) — always uploaded as `PaperKnife-debug-vX.Y.Z` artifact, no signing secrets needed, directly installable.
+4. Builds two **unsigned release APKs** (global + F-Droid lite without OCR), then signs and uploads them only if `ANDROID_SIGNING_KEY` secret is set.
 
 ### Privacy invariant
 
