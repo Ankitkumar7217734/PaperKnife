@@ -49,29 +49,37 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Build Global APK
+      - name: Set App Version
+        id: version
+        run: echo "value=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Build Debug APK
         run: |
           cd android
           chmod +x gradlew
+          ./gradlew assembleDebug
+          mkdir -p ../debug-artifacts
+          mv app/build/outputs/apk/debug/app-debug.apk "../debug-artifacts/paperknife-debug-v${{ steps.version.outputs.value }}.apk"
+
+      - name: Build Global Release APK
+        run: |
+          cd android
           ./gradlew assembleRelease
           mv app/build/outputs/apk/release/app-release-unsigned.apk ../paperknife-global-unsigned.apk
 
       - name: Build F-Droid Lite APK (No OCR)
         run: |
-          # Clean assets
           rm -rf public/tesseract/
-          
-          # Rebuild without OCR using environment variable
           export VITE_DISABLE_OCR=true
           npm run build
           npx cap sync android
-          
           cd android
           ./gradlew assembleRelease
           mv app/build/outputs/apk/release/app-release-unsigned.apk ../paperknife-fdroid-unsigned.apk
 
-      - name: Sign Both APKs
+      - name: Sign Release APKs
         id: sign_app
+        if: secrets.ANDROID_SIGNING_KEY != ''
         uses: ilharp/sign-android-release@v2
         with:
           releaseDir: .
@@ -81,18 +89,25 @@ jobs:
           keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
           buildToolsVersion: "34.0.0"
 
-      - name: Rename & Prepare Artifacts
+      - name: Rename Signed Release APKs
+        if: secrets.ANDROID_SIGNING_KEY != ''
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          cp paperknife-global-unsigned-signed.apk "paperknife-v${VERSION}.apk"
-          cp paperknife-fdroid-unsigned-signed.apk "paperknife-lite-v${VERSION}.apk"
-          echo "APP_VERSION=${VERSION}" >> $GITHUB_ENV
+          cp paperknife-global-unsigned-signed.apk "paperknife-v${{ steps.version.outputs.value }}.apk"
+          cp paperknife-fdroid-unsigned-signed.apk "paperknife-lite-v${{ steps.version.outputs.value }}.apk"
 
-      - name: Upload Artifacts
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: PaperKnife-v${{ env.APP_VERSION }}
+          name: PaperKnife-debug-v${{ steps.version.outputs.value }}
+          path: debug-artifacts/paperknife-debug-v${{ steps.version.outputs.value }}.apk
+          if-no-files-found: error
+
+      - name: Upload Signed Release APKs
+        if: secrets.ANDROID_SIGNING_KEY != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: PaperKnife-v${{ steps.version.outputs.value }}
           path: |
-            paperknife-v${{ env.APP_VERSION }}.apk
-            paperknife-lite-v${{ env.APP_VERSION }}.apk
+            paperknife-v${{ steps.version.outputs.value }}.apk
+            paperknife-lite-v${{ steps.version.outputs.value }}.apk
           if-no-files-found: error

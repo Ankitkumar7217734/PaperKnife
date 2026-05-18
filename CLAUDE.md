@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `npm run dev` — start Vite dev server (host exposed for LAN/device testing).
 - `npm run build` — `tsc` typecheck then `vite build` into `dist/`.
-- `npm run lint` — ESLint over `ts,tsx` with `--max-warnings 0` (treat any warning as a failure).
+- `npm run lint` — **known broken:** the installed ESLint is v9, which requires a flat `eslint.config.js`; the repo carries v8-style config and doesn't have one, so this command currently errors out before running. Don't chase it — rely on `npm run build` (which runs `tsc`) for type/correctness checks. If you fix lint, port the config to flat-config form.
 - `npm run preview` — preview the production build.
 - Android sync after a web build: `npx cap sync android`, then `cd android && ./gradlew assembleRelease`.
 - The web GH Pages build is served under a subpath; set `VITE_BASE=/PaperKnife/` (see `.github/workflows/deploy.yml`). Local/Android builds use relative `./` base.
@@ -28,6 +28,7 @@ Because the codebase targets both shells from one source, **`Capacitor.isNativeP
 - The `tools` array (and exported `activeTools`, filtered by `IS_OCR_DISABLED`) drives the home grids, the QuickDrop modal, and the Android tools view. Adding a tool means: add to `tools`, add a `<Route>`, and create a component under `src/components/tools/`.
 - Routes are `HashRouter`-based (required for static hosting under a subpath and for Capacitor's `file://` scheme).
 - Tool components are statically imported (not lazy), intentionally — the comment in `App.tsx` notes that dynamic imports break in the Android APK shell.
+- Not every tool is PDF-in/PDF-out. `CompressImageTool` accepts and emits images (`image/jpeg|png|webp`). When you add a non-PDF tool, set `showPreview={false}` on `SuccessState` (the built-in preview is a `PdfPreview`), and rely on the shared mime-from-filename derivation (see Save/share below).
 
 ### File pipeline between tools
 
@@ -43,6 +44,8 @@ Because the codebase targets both shells from one source, **`Capacitor.isNativeP
 ### Save / share abstraction
 
 Never use raw `<a download>` or browser blob downloads directly. Use `downloadFile` in `src/utils/pdfHelpers.ts` — it routes to `Capacitor.Filesystem` + `Share` on Android and to a blob link on web, including chunked base64 conversion for large buffers.
+
+Most tools delegate download/share/preview to the shared `SuccessState` component (`src/components/tools/shared/SuccessState.tsx`). It derives the MIME type via a local `mimeFromName(fileName)` helper (zip/png/jpg/jpeg/webp/gif/txt → matching MIME; default `application/pdf`). **Set the correct extension on the `fileName` you pass in** — there is no `mimeType` prop. If you add a new output format, extend `mimeFromName`.
 
 ### Android "Open With" / share intents
 
