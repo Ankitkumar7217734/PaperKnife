@@ -12,7 +12,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { 
   Layers, Scissors, Zap, Smartphone as SmartphoneIcon, Monitor as MonitorIcon, Lock, Unlock, 
   RotateCw, Type, Hash, Tags, FileText, ArrowUpDown, PenTool, 
-  Wrench, ImagePlus, FileImage, Palette, X, ChevronDown, LayoutGrid, ImageDown
+  Wrench, ImagePlus, FileImage, Palette, X, ChevronDown, LayoutGrid, ImageDown, Expand, ImageUp
 } from 'lucide-react'
 import { HashRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { Toaster, toast } from 'sonner'
@@ -56,6 +56,8 @@ import ExtractImagesTool from './components/tools/ExtractImagesTool'
 import GrayscaleTool from './components/tools/GrayscaleTool'
 import NUpTool from './components/tools/NUpTool'
 import CompressImageTool from './components/tools/CompressImageTool'
+import IncreasePdfTool from './components/tools/IncreasePdfTool'
+import IncreaseImageTool from './components/tools/IncreaseImageTool'
 
 const tools: Tool[] = [
   { title: 'Merge PDF', desc: 'Combine multiple PDF files into one document.', icon: Layers, implemented: true, path: '/merge', category: 'Edit', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-900/20' },
@@ -77,6 +79,8 @@ const tools: Tool[] = [
   { title: 'Repair PDF', desc: 'Attempt to fix corrupted or unreadable documents.', icon: Wrench, implemented: true, path: '/repair', category: 'Optimize', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
   { title: 'N-Up Pages', desc: 'Place 2, 4, or 6 pages onto one sheet for printing.', icon: LayoutGrid, implemented: true, path: '/nup', category: 'Edit', color: 'text-fuchsia-500', bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/20' },
   { title: 'Compress Image', desc: 'Shrink image size and resize to required dimensions.', icon: ImageDown, implemented: true, path: '/compress-image', category: 'Optimize', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
+  { title: 'Increase PDF Size', desc: 'Pad a PDF up to an exact target size in KB or MB.', icon: Expand, implemented: true, path: '/increase-pdf', category: 'Optimize', color: 'text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' },
+  { title: 'Increase Image Size', desc: 'Pad an image up to an exact target size in KB or MB.', icon: ImageUp, implemented: true, path: '/increase-image', category: 'Optimize', color: 'text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/20' },
 ]
 
 export const IS_OCR_DISABLED = import.meta.env.VITE_DISABLE_OCR === 'true'
@@ -379,6 +383,8 @@ function App() {
                 <Route path="/grayscale" element={<GrayscaleTool />} />
                 <Route path="/nup" element={<NUpTool />} />
                 <Route path="/compress-image" element={<CompressImageTool />} />
+                <Route path="/increase-pdf" element={<IncreasePdfTool />} />
+                <Route path="/increase-image" element={<IncreaseImageTool />} />
                 <Route path="/about" element={<About viewMode={viewMode} />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/settings" element={<SettingsView theme={theme} setTheme={setTheme} />} />
