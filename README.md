@@ -14,9 +14,9 @@
 
 ## Download Android APK
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v1.0.9-brightgreen?style=for-the-badge&logo=android)](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.0.9/paperknife-debug-v1.0.9.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v1.1.0-brightgreen?style=for-the-badge&logo=android)](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.1.0/paperknife-debug-v1.1.0.apk)
 
-> **Direct link:** https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.0.9/paperknife-debug-v1.0.9.apk
+> **Direct link:** https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.1.0/paperknife-debug-v1.1.0.apk
 
 ---
 
