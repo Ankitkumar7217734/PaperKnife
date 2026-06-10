@@ -70,7 +70,8 @@ export default function PdfToImageTool() {
     if (!pdfData || !pdfData.pdfDoc) return
     setIsProcessing(true); setProgress(0); await new Promise(resolve => setTimeout(resolve, 100))
     try {
-      const zip = new JSZip(); const scale = 2.0
+      // A ZIP is only appropriate for multi-page output; a single page emits the image itself
+      const zip = pdfData.pageCount > 1 ? new JSZip() : null; const scale = 2.0
       for (let i = 1; i <= pdfData.pageCount; i++) {
         const page = await pdfData.pdfDoc.getPage(i); const viewport = page.getViewport({ scale })
         const canvas = document.createElement('canvas'); const context = canvas.getContext('2d')
@@ -79,19 +80,33 @@ export default function PdfToImageTool() {
         await page.render({ canvasContext: context, viewport }).promise
         const imgData = canvas.toDataURL(format === 'png' ? 'image/png' : 'image/jpeg', 0.8)
         const base64Data = imgData.split(',')[1]
-        const padNum = i.toString().padStart(Math.max(2, pdfData.pageCount.toString().length), '0')
-        zip.file(`${customFileName}-${padNum}.${format}`, base64Data, { base64: true })
+        if (zip) {
+          const padNum = i.toString().padStart(Math.max(2, pdfData.pageCount.toString().length), '0')
+          zip.file(`${customFileName}-${padNum}.${format}`, base64Data, { base64: true })
+        } else {
+          const imgBlob = await (await fetch(imgData)).blob()
+          const url = URL.createObjectURL(imgBlob); setDownloadUrl(url)
+          const imageName = `${customFileName}.${format}`
+          setPipelineFile({
+            buffer: new Uint8Array(await imgBlob.arrayBuffer()),
+            name: imageName,
+            type: format === 'png' ? 'image/png' : 'image/jpeg'
+          })
+          addActivity({ name: imageName, tool: 'PDF to Image', size: imgBlob.size, resultUrl: url })
+        }
         setProgress(Math.round((i / pdfData.pageCount) * 100))
       }
-      const zipBlob = await zip.generateAsync({ type: 'blob' })
-      const url = URL.createObjectURL(zipBlob); setDownloadUrl(url)
-      const zipBuffer = new Uint8Array(await zipBlob.arrayBuffer())
-      setPipelineFile({
-        buffer: zipBuffer,
-        name: `${customFileName}.zip`,
-        type: 'application/zip'
-      })
-      addActivity({ name: `${customFileName}.zip`, tool: 'PDF to Image', size: zipBlob.size, resultUrl: url })
+      if (zip) {
+        const zipBlob = await zip.generateAsync({ type: 'blob' })
+        const url = URL.createObjectURL(zipBlob); setDownloadUrl(url)
+        const zipBuffer = new Uint8Array(await zipBlob.arrayBuffer())
+        setPipelineFile({
+          buffer: zipBuffer,
+          name: `${customFileName}.zip`,
+          type: 'application/zip'
+        })
+        addActivity({ name: `${customFileName}.zip`, tool: 'PDF to Image', size: zipBlob.size, resultUrl: url })
+      }
     } catch (error: any) { toast.error(`Error: ${error.message}`) } finally { setIsProcessing(false) }
   }
 
@@ -133,10 +148,10 @@ export default function PdfToImageTool() {
             {!downloadUrl ? (
               <>
                 <div><label className="block text-[10px] font-black uppercase text-gray-400 mb-4 tracking-widest px-1">Image Format</label><div className="grid grid-cols-2 gap-3">{(['jpg', 'png'] as const).map(fmt => <button key={fmt} onClick={() => setFormat(fmt)} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center ${format === fmt ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-900/10' : 'border-gray-100 dark:border-white/5'}`}><span className={`font-black uppercase text-[10px] ${format === fmt ? 'text-rose-500' : 'text-gray-400'}`}>{fmt}</span></button>)}</div></div>
-                <div><label className="block text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest px-1">Output ZIP Name</label><input type="text" value={customFileName} onChange={(e) => setCustomFileName(e.target.value)} className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" /></div>
+                <div><label className="block text-[10px] font-black uppercase text-gray-400 mb-3 tracking-widest px-1">{pdfData.pageCount > 1 ? 'Output ZIP Name' : 'Output Image Name'}</label><input type="text" value={customFileName} onChange={(e) => setCustomFileName(e.target.value)} className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" /></div>
               </>
             ) : (
-              <SuccessState message="Images Ready!" downloadUrl={downloadUrl} fileName={`${customFileName}.zip`} onStartOver={() => { setDownloadUrl(null); setProgress(0); setPdfData(null); setIsProcessing(false); }} showPreview={false} />
+              <SuccessState message={pdfData.pageCount > 1 ? 'Images Ready!' : 'Image Ready!'} downloadUrl={downloadUrl} fileName={pdfData.pageCount > 1 ? `${customFileName}.zip` : `${customFileName}.${format}`} onStartOver={() => { setDownloadUrl(null); setProgress(0); setPdfData(null); setIsProcessing(false); }} showPreview={false} />
             )}
             <button onClick={() => { setPdfData(null); setIsProcessing(false); }} className="w-full py-2 text-[10px] font-black uppercase text-gray-300 hover:text-rose-500 transition-colors">Close File</button>
           </div>
