@@ -55,7 +55,7 @@ export default function AndroidHistoryView() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-black pb-32 transition-colors">
-      <header className="px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-6 sticky top-0 bg-[#FAFAFA]/90 dark:bg-black/90 backdrop-blur-xl z-50 border-b border-gray-100 dark:border-white/5">
+      <header className="px-6 pt-[calc(env(safe-area-inset-top)+1rem)] pb-6 sticky top-0 bg-[#FAFAFA]/90 dark:bg-black/90 backdrop-blur-xl z-50 border-b border-gray-100 dark:border-white/10">
         <div className="flex items-center justify-between mb-6">
           <div className="flex flex-col text-left">
             <h1 className="text-3xl font-black tracking-tighter dark:text-white">Activity</h1>
@@ -80,7 +80,7 @@ export default function AndroidHistoryView() {
             placeholder="Search documents..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/5 rounded-2xl py-4 pl-14 pr-6 text-sm font-bold placeholder:text-gray-400 focus:bg-white dark:focus:bg-zinc-800 shadow-sm outline-none transition-all dark:text-white"
+            className="w-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-white/10 rounded-2xl py-4 pl-14 pr-6 text-sm font-bold placeholder:text-gray-400 focus:bg-white dark:focus:bg-zinc-800 shadow-sm outline-none transition-all dark:text-white"
           />
           {searchQuery && (
             <button 
@@ -104,7 +104,7 @@ export default function AndroidHistoryView() {
           </div>
         ) : (
           filteredHistory.map((item) => (
-            <div key={item.id} className="p-4 bg-white dark:bg-zinc-900 rounded-[2rem] border border-gray-100 dark:border-white/5 flex items-center gap-4 active:scale-[0.99] transition-all shadow-sm group">
+            <div key={item.id} className="p-4 bg-white dark:bg-zinc-900 rounded-[2rem] border border-gray-100 dark:border-white/10 flex items-center gap-4 active:scale-[0.99] transition-all shadow-sm group">
               <div className="w-12 h-12 bg-gray-50 dark:bg-zinc-800 text-gray-400 group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 group-hover:text-rose-500 rounded-2xl flex items-center justify-center shrink-0 transition-colors shadow-inner">
                 <FileTextIcon size={22} />
               </div>
@@ -138,7 +138,7 @@ export default function AndroidHistoryView() {
           ))
         )}
 
-        <div className="pt-12 flex flex-col items-center gap-3 pb-10 opacity-30">
+        <div className="pt-12 flex flex-col items-center gap-3 pb-10 opacity-50">
            <div className="flex items-center gap-2">
              <ShieldIcon size={14} className="text-emerald-500" />
              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-gray-500">Privacy Protocol</span>

@@ -48,14 +48,38 @@ body {
   overflow-x: hidden;
 }
 
-/* Global seamless theme transition - target only background and text colors */
-.theme-transition {
-  @apply transition-colors duration-500 ease-in-out;
+/*
+ * Theme switching — fallback fade.
+ * Applied to <html> only while the theme is changing, so hover/press
+ * interactions stay snappy the rest of the time. Covers every element
+ * (including headings, links, and SVG icons) so nothing snaps while
+ * containers fade.
+ */
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out, border-color 0.5s ease-in-out, fill 0.5s ease-in-out, stroke 0.5s ease-in-out, box-shadow 0.5s ease-in-out !important;
 }
 
-/* Specific component transitions */
-header, footer, nav, aside, main, section, div, button, input, select {
-  transition: background-color 0.5s ease-in-out, border-color 0.5s ease-in-out, color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+/*
+ * Theme switching — circular reveal (View Transitions API).
+ * The default crossfade is disabled only while .vt-circle is set;
+ * the expanding clip-path circle is driven from App.tsx.
+ */
+html.vt-circle::view-transition-old(root),
+html.vt-circle::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.vt-circle::view-transition-old(root) { z-index: 1; }
+html.vt-circle::view-transition-new(root) { z-index: 9999; }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
 }
 
 .pt-safe {

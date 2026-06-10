@@ -23,4 +23,6 @@ export interface Tool {
 
   bg?: string
 
+  isNew?: boolean
+
 }

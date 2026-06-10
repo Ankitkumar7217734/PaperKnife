@@ -6,6 +6,7 @@
 import { Shield, EyeOff, ServerOff, Database as DatabaseIcon, History as HistoryIcon, ExternalLink, Lock, Trash2, Cpu } from 'lucide-react'
 import { Capacitor } from '@capacitor/core'
 import { NativeToolLayout } from './tools/shared/NativeToolLayout'
+import { useViewMode } from '../utils/viewModeContext'
 import { PaperKnifeLogo } from './Logo'
 
 // --- WEB VERSION (TITAN HIGH-DENSITY) ---
@@ -190,8 +191,8 @@ const PrivacyItem = ({ icon: Icon, title, desc, color }: { icon: any, title: str
 
 // --- MAIN ROUTER ---
 export default function PrivacyPolicy() {
-  const isNative = Capacitor.isNativePlatform()
-  const isAndroidView = isNative || document.body.classList.contains('android-mode') || window.location.pathname.includes('android')
+  const { viewMode } = useViewMode()
+  const isAndroidView = Capacitor.isNativePlatform() || viewMode === 'android'
 
   return isAndroidView ? <PrivacyAPK /> : <PrivacyWeb />
 }

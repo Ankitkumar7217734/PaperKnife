@@ -28,7 +28,7 @@ import { PaperKnifeLogo } from './Logo'
 
 interface AndroidViewProps {
   theme: 'light' | 'dark'
-  toggleTheme: () => void
+  toggleTheme: (e?: { clientX: number; clientY: number }) => void
   onFileSelect?: (file: File) => void
 }
 
@@ -56,7 +56,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAFA] dark:bg-black transition-colors pb-24 text-left">
+    <div className="flex flex-col min-h-screen bg-[#FAFAFA] dark:bg-black transition-colors pb-44 text-left">
       <input 
         type="file" 
         accept=".pdf" 
@@ -127,7 +127,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
                <button onClick={() => navigate('/android-history')} className="text-[9px] font-black uppercase text-rose-500 tracking-wider">View All</button>
             </div>
             
-            <div className="bg-white dark:bg-zinc-900 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm divide-y divide-gray-50 dark:divide-white/5 overflow-hidden">
+            <div className="bg-white dark:bg-zinc-900 rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-sm divide-y divide-gray-50 dark:divide-white/10 overflow-hidden">
               {history.map((item) => (
                 <button 
                   key={item.id} 
@@ -163,7 +163,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
                 <button
                   key={action.title}
                   onClick={() => navigate(action.path)}
-                  className="p-5 bg-white dark:bg-zinc-900 rounded-[2rem] border border-gray-100 dark:border-white/5 flex flex-col justify-between h-32 shadow-sm active:bg-gray-50 dark:active:bg-white/5 transition-colors text-left relative overflow-hidden"
+                  className="p-5 bg-white dark:bg-zinc-900 rounded-[2rem] border border-gray-100 dark:border-white/10 flex flex-col justify-between h-32 shadow-sm active:bg-gray-50 dark:active:bg-white/5 transition-colors text-left relative overflow-hidden"
                 >
                   <div className={`w-10 h-10 ${action.bg} ${action.color} rounded-xl flex items-center justify-center mb-2`}>
                     <action.icon size={20} strokeWidth={2.5} />
@@ -197,11 +197,6 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
               </button>
            </div>
         </section>
-
-        {/* Minimal Footer */}
-        <div className="flex flex-col items-center gap-2 py-8 opacity-20">
-           <p className="text-[8px] font-black uppercase tracking-[0.4em] dark:text-white text-center">PaperKnife v1.1.0</p>
-        </div>
 
       </main>
     </div>

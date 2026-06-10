@@ -30,7 +30,7 @@ import { hapticImpact } from '../utils/haptics'
 interface LayoutProps {
   children: React.ReactNode
   theme: Theme
-  toggleTheme: () => void
+  toggleTheme: (e?: { clientX: number; clientY: number }) => void
   tools: Tool[]
   onFileDrop?: (files: FileList) => void
   viewMode: ViewMode
@@ -135,7 +135,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
         <header className="flex items-center justify-between px-4 md:px-8 h-16 md:h-20 border-b border-gray-100 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-[100]">
           <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
             {!isHome && (
-              <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-xl transition-colors text-gray-500 hover:text-rose-500 shrink-0"><ArrowLeftIcon size={20} /></button>
+              <button onClick={() => navigate('/')} aria-label="Go back to home" className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-xl transition-colors text-gray-500 hover:text-rose-500 shrink-0"><ArrowLeftIcon size={20} /></button>
             )}
             <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
               <PaperKnifeLogo size={Capacitor.isNativePlatform() ? 24 : 28} iconColor="#F43F5E" />
@@ -158,9 +158,9 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
                           {categoryTools.map((tool, i) => {
                             const Icon = tool.icon; const isActive = activeTool?.title === tool.title && !isHome
                             return (
-                              <button key={i} onClick={() => { navigate(tool.path || '/'); setIsDropdownOpen(false); }} className={`flex items-center gap-4 p-3 rounded-2xl transition-all text-left group ${isActive ? `${colors.bg} ${colors.text}` : `hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-500 dark:text-gray-400`}`}>
+                              <button key={i} onClick={() => { navigate(tool.path || '/'); setIsDropdownOpen(false); }} className={`flex items-center gap-4 p-3 rounded-2xl transition-all text-left group ${isActive ? `${colors.bg} ${colors.text}` : `hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-500 dark:text-zinc-100`}`}>
                                 <div className={`p-2 rounded-lg transition-colors ${isActive ? 'bg-white dark:bg-zinc-800' : `${colors.iconBg} ${colors.text} opacity-70 group-hover:opacity-100`}`}><Icon size={18} /></div>
-                                <div className="flex-1 min-w-0"><p className="text-xs font-black uppercase tracking-tight">{tool.title}</p><p className="text-[10px] opacity-60 truncate">{tool.desc}</p></div>
+                                <div className="flex-1 min-w-0"><p className={`text-xs font-black uppercase tracking-tight ${isActive ? '' : 'dark:text-white'}`}>{tool.title}</p><p className="text-[10px] opacity-60 dark:opacity-75 truncate">{tool.desc}</p></div>
                               </button>
                             )
                           })}
@@ -187,10 +187,10 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
               <InfoIcon size={18} />
               <span className="hidden sm:block">About</span>
             </Link>
-            <button onClick={toggleTheme} className="p-2 text-gray-400 hover:text-rose-500 transition-colors">
+            <button onClick={toggleTheme} aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'} className="p-2 text-gray-400 hover:text-rose-500 transition-colors">
               {theme === 'light' ? <MoonIcon size={20} /> : <SunIcon size={20} />}
             </button>
-            <button onClick={() => setShowHistory(true)} className={`p-2 transition-colors relative ${showHistory ? 'text-rose-500' : 'text-gray-400 hover:text-rose-500'}`}>
+            <button onClick={() => setShowHistory(true)} aria-label="Recent activity" className={`p-2 transition-colors relative ${showHistory ? 'text-rose-500' : 'text-gray-400 hover:text-rose-500'}`}>
               <HistoryIcon size={20} />
               {activity.length > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-black" />}
             </button>
@@ -224,7 +224,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
                       <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
                       Live Engine
                    </div>
-                   <a href="https://github.com/Ankitkumar7217734/PaperKnife" target="_blank" className="p-2 bg-gray-50 dark:bg-zinc-900 rounded-xl hover:bg-rose-500 hover:text-white transition-all text-gray-500 dark:text-zinc-500">
+                   <a href="https://github.com/Ankitkumar7217734/PaperKnife" target="_blank" aria-label="GitHub repository" className="p-2 bg-gray-50 dark:bg-zinc-900 rounded-xl hover:bg-rose-500 hover:text-white transition-all text-gray-500 dark:text-zinc-500">
                      <GHIcon size={14} />
                    </a>
                 </div>

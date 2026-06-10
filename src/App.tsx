@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, Suspense } from 'react'
+import { flushSync } from 'react-dom'
 import { 
   Layers, Scissors, Zap, Smartphone as SmartphoneIcon, Monitor as MonitorIcon, Lock, Unlock, 
   RotateCw, Type, Hash, Tags, FileText, ArrowUpDown, PenTool, 
@@ -18,11 +19,13 @@ import { HashRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { Toaster, toast } from 'sonner'
 import { Capacitor } from '@capacitor/core'
 import { Filesystem } from '@capacitor/filesystem'
+import { StatusBar, Style } from '@capacitor/status-bar'
 import { Theme, ViewMode, Tool } from './types'
 import Layout from './components/Layout'
 import { PipelineProvider, usePipeline } from './utils/pipelineContext'
 import { ViewModeProvider } from './utils/viewModeContext'
 import { clearActivity, updateLastSeen, getLastSeen } from './utils/recentActivity'
+import { hapticSelection } from './utils/haptics'
 import ScrollToTop from './components/ScrollToTop'
 
 // Critical Views - No lazy loading to prevent dynamic import errors on Android
@@ -79,14 +82,43 @@ const tools: Tool[] = [
   { title: 'Repair PDF', desc: 'Attempt to fix corrupted or unreadable documents.', icon: Wrench, implemented: true, path: '/repair', category: 'Optimize', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
   { title: 'N-Up Pages', desc: 'Place 2, 4, or 6 pages onto one sheet for printing.', icon: LayoutGrid, implemented: true, path: '/nup', category: 'Edit', color: 'text-fuchsia-500', bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/20' },
   { title: 'Compress Image', desc: 'Shrink image size and resize to required dimensions.', icon: ImageDown, implemented: true, path: '/compress-image', category: 'Optimize', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
-  { title: 'Increase PDF Size', desc: 'Pad a PDF up to an exact target size in KB or MB.', icon: Expand, implemented: true, path: '/increase-pdf', category: 'Optimize', color: 'text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' },
-  { title: 'Increase Image Size', desc: 'Pad an image up to an exact target size in KB or MB.', icon: ImageUp, implemented: true, path: '/increase-image', category: 'Optimize', color: 'text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/20' },
+  { title: 'Increase PDF Size', desc: 'Pad a PDF up to an exact target size in KB or MB.', icon: Expand, implemented: true, path: '/increase-pdf', category: 'Optimize', color: 'text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20', isNew: true },
+  { title: 'Increase Image Size', desc: 'Pad an image up to an exact target size in KB or MB.', icon: ImageUp, implemented: true, path: '/increase-image', category: 'Optimize', color: 'text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/20', isNew: true },
 ]
 
 export const IS_OCR_DISABLED = import.meta.env.VITE_DISABLE_OCR === 'true'
-export const activeTools = IS_OCR_DISABLED 
-  ? tools.filter(t => t.path !== '/pdf-to-text') 
+export const activeTools = IS_OCR_DISABLED
+  ? tools.filter(t => t.path !== '/pdf-to-text')
   : tools
+
+const resolveTheme = (t: Theme): 'light' | 'dark' =>
+  t === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : t
+
+// Flips the document into the resolved theme, keeping the browser UI
+// (address bar / PWA title bar) in sync via the theme-color meta tag.
+const applyThemeToDom = (resolved: 'light' | 'dark') => {
+  const root = document.documentElement
+  if (resolved === 'dark') {
+    root.classList.add('dark')
+    root.style.colorScheme = 'dark'
+  } else {
+    root.classList.remove('dark')
+    root.style.colorScheme = 'light'
+  }
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'dark' ? '#000000' : '#FAFAFA')
+  // Keep the Android system status bar in sync with the in-app theme
+  if (Capacitor.isNativePlatform()) {
+    StatusBar.setStyle({ style: resolved === 'dark' ? Style.Dark : Style.Light }).catch(() => {})
+    StatusBar.setBackgroundColor({ color: resolved === 'dark' ? '#000000' : '#FAFAFA' }).catch(() => {})
+  }
+}
+
+// Briefly puts every element under one shared transition so nothing snaps
+const fadeThemeSwitch = () => {
+  const root = document.documentElement
+  root.classList.add('theme-switching')
+  window.setTimeout(() => root.classList.remove('theme-switching'), 650)
+}
 
 function QuickDropModal({ file, onClear, onBack }: { file: File, onClear: () => void, onBack?: () => void }) {
   const navigate = useNavigate()
@@ -205,8 +237,47 @@ function App() {
     return 'system'
   })
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+  // Central animated theme switch: circular reveal from the click point when
+  // the View Transitions API is available, a uniform full-page fade otherwise,
+  // and an instant flip for users who prefer reduced motion.
+  const changeTheme = (next: Theme, origin?: { x: number; y: number }) => {
+    hapticSelection()
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> }
+    }
+
+    const apply = () => {
+      applyThemeToDom(resolveTheme(next))
+      flushSync(() => setTheme(next))
+    }
+
+    if (reducedMotion || !doc.startViewTransition) {
+      if (!reducedMotion) fadeThemeSwitch()
+      apply()
+      return
+    }
+
+    const root = document.documentElement
+    if (origin) root.classList.add('vt-circle')
+    const transition = doc.startViewTransition(apply)
+
+    if (origin) {
+      transition.ready.then(() => {
+        const { x, y } = origin
+        const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
+        root.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          { duration: 550, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', pseudoElement: '::view-transition-new(root)' }
+        )
+      }).catch(() => {})
+      transition.finished.finally(() => root.classList.remove('vt-circle'))
+    }
+  }
+
+  const toggleTheme = (e?: { clientX: number; clientY: number }) => {
+    const next = resolveTheme(theme) === 'light' ? 'dark' : 'light'
+    changeTheme(next, e && typeof e.clientX === 'number' ? { x: e.clientX, y: e.clientY } : undefined)
   }
 
   // Improved Auto-Wipe Logic
@@ -231,29 +302,16 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const root = window.document.documentElement
-    
-    const applyTheme = (t: Theme) => {
-      let resolvedTheme = t
-      if (t === 'system') {
-        resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-      }
-      
-      if (resolvedTheme === 'dark') {
-        root.classList.add('dark')
-        root.style.colorScheme = 'dark'
-      } else {
-        root.classList.remove('dark')
-        root.style.colorScheme = 'light'
-      }
-    }
-
-    applyTheme(theme)
+    applyThemeToDom(resolveTheme(theme))
     localStorage.setItem('theme', theme)
 
     if (theme === 'system') {
       const media = window.matchMedia('(prefers-color-scheme: dark)')
-      const listener = () => applyTheme('system')
+      const listener = () => {
+        // OS-level theme flips get the uniform fade too
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) fadeThemeSwitch()
+        applyThemeToDom(resolveTheme('system'))
+      }
       media.addEventListener('change', listener)
       return () => media.removeEventListener('change', listener)
     }
@@ -387,7 +445,7 @@ function App() {
                 <Route path="/increase-image" element={<IncreaseImageTool />} />
                 <Route path="/about" element={<About viewMode={viewMode} />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
-                <Route path="/settings" element={<SettingsView theme={theme} setTheme={setTheme} />} />
+                <Route path="/settings" element={<SettingsView theme={theme} setTheme={changeTheme} />} />
                 <Route path="/thanks" element={<Thanks />} />
               </Routes>
             </Suspense>

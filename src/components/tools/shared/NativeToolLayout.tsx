@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Capacitor } from '@capacitor/core'
 import ToolHeader from './ToolHeader'
+import { useViewMode } from '../../../utils/viewModeContext'
 
 interface NativeToolLayoutProps {
   title: string
@@ -20,21 +21,17 @@ export const NativeToolLayout = ({
   onBack 
 }: NativeToolLayoutProps) => {
   const navigate = useNavigate()
-  
-  // Determine if we should show the native-style header
-  // It should only show if we are in Android/APK mode
-  const isNative = Capacitor.isNativePlatform()
-  const isAndroidView = isNative || document.body.classList.contains('android-mode') || window.location.pathname.includes('android')
-  
-  // A more reliable way is to check the layout context or simply use media queries 
-  // but since we want to avoid double headers with the main Layout.tsx:
-  const showNativeHeader = isAndroidView
+  const { viewMode } = useViewMode()
+
+  // Native-style header only in Android/APK mode (hash routing means
+  // window.location.pathname can never identify the view)
+  const showNativeHeader = Capacitor.isNativePlatform() || viewMode === 'android'
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFAFA] dark:bg-black transition-colors">
       {/* Ultra-Compact Native AppBar - Only shown in Android/Native mode on mobile */}
       {showNativeHeader && (
-        <header className="px-4 pt-safe pb-1 flex items-center justify-between sticky top-0 z-30 bg-[#FAFAFA]/95 dark:bg-black/95 backdrop-blur-xl md:hidden border-b border-gray-100 dark:border-white/5">
+        <header className="px-4 pt-safe pb-1 flex items-center justify-between sticky top-0 z-30 bg-[#FAFAFA]/95 dark:bg-black/95 backdrop-blur-xl md:hidden border-b border-gray-100 dark:border-white/10">
           <div className="flex items-center gap-2 h-14">
             <button 
               onClick={onBack || (() => navigate(-1))}
@@ -63,7 +60,7 @@ export const NativeToolLayout = ({
 
       {/* Grounded Bottom Action Bar */}
       {actions && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-black/95 backdrop-blur-xl border-t border-gray-100 dark:border-white/5 z-40 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-black/95 backdrop-blur-xl border-t border-gray-100 dark:border-white/10 z-40 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
            <div className="p-4 max-w-md mx-auto">
              {actions}
            </div>
