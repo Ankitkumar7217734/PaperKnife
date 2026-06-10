@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./icons/logo.svg" />
-    <meta name="theme-color" content="#F43F5E" />
+    <meta name="theme-color" content="#FAFAFA" />
     <link rel="apple-touch-icon" href="./icons/logo.svg" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -28,21 +28,25 @@
 
     <script>
       (function() {
-        const savedTheme = localStorage.getItem('theme');
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
-          document.documentElement.classList.add('dark');
-          document.documentElement.style.colorScheme = 'dark';
-        }
+        try {
+          var savedTheme = localStorage.getItem('theme');
+          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (savedTheme === 'dark' || ((!savedTheme || savedTheme === 'system') && systemDark)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', '#000000');
+          }
+        } catch (e) {}
       })();
     </script>
-    <script type="module" crossorigin src="/PaperKnife/assets/index-Ccm_ze6x.js"></script>
-    <link rel="modulepreload" crossorigin href="/PaperKnife/assets/vendor-ui-kyd4H73r.js">
+    <script type="module" crossorigin src="/PaperKnife/assets/index-f73N6gZI.js"></script>
+    <link rel="modulepreload" crossorigin href="/PaperKnife/assets/vendor-ui-CgRIoViQ.js">
     <link rel="modulepreload" crossorigin href="/PaperKnife/assets/pdfjs-viewer-BENO9Ct1.js">
-    <link rel="modulepreload" crossorigin href="/PaperKnife/assets/tesseract-core-CvN17C2U.js">
-    <link rel="modulepreload" crossorigin href="/PaperKnife/assets/vendor-utils-CONTbaeY.js">
-    <link rel="modulepreload" crossorigin href="/PaperKnife/assets/pdf-lib-core-TpvTVBoy.js">
-    <link rel="stylesheet" crossorigin href="/PaperKnife/assets/index-C1zurYED.css">
+    <link rel="modulepreload" crossorigin href="/PaperKnife/assets/tesseract-core-BEc3lkO2.js">
+    <link rel="modulepreload" crossorigin href="/PaperKnife/assets/vendor-utils-DGOdK7bU.js">
+    <link rel="modulepreload" crossorigin href="/PaperKnife/assets/pdf-lib-core-CPz7Viox.js">
+    <link rel="stylesheet" crossorigin href="/PaperKnife/assets/index-Clp7nEb3.css">
   </head>
   <body>
     <div id="root"></div>
