@@ -229,7 +229,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
                    </a>
                 </div>
                 <a
-                  href="https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.1.0/paperknife-debug-v1.1.0.apk"
+                  href="https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.2.0/paperknife-debug-v1.2.0.apk"
                   className="inline-flex items-center gap-2.5 px-5 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-rose-500/20"
                 >
                   <SmartphoneIcon size={14} /> Download Android App (APK)
