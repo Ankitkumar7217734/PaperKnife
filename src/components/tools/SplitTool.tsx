@@ -206,7 +206,7 @@ export default function SplitTool() {
       {!pdfData ? (
         <button 
           onClick={() => !isLoadingMeta && fileInputRef.current?.click()} 
-          className={`w-full border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group ${isLoadingMeta ? 'opacity-50 cursor-wait' : ''}`}
+          className={`w-full border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group ${isLoadingMeta ? 'opacity-50 cursor-wait' : ''}`}
         >
           {isLoadingMeta ? (
             <div className="flex flex-col items-center">
@@ -225,7 +225,7 @@ export default function SplitTool() {
         </button>
       ) : pdfData.isLocked ? (
         <div className="max-w-md mx-auto relative z-[100]">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl text-center">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-pk-border dark:border-white/5 shadow-2xl text-center">
             <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <Lock size={32} />
             </div>
@@ -235,7 +235,7 @@ export default function SplitTool() {
               value={unlockPassword}
               onChange={(e) => setUnlockPassword(e.target.value)}
               placeholder="Enter Password"
-              className="w-full bg-gray-50 dark:bg-black rounded-2xl px-6 py-4 border border-transparent focus:border-rose-500 outline-none font-bold text-center mb-4 dark:text-white"
+              className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-2xl px-6 py-4 border border-transparent focus:border-rose-500 outline-none font-bold text-center mb-4 dark:text-white"
               autoFocus
             />
             <button 
@@ -249,8 +249,8 @@ export default function SplitTool() {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-gray-100 dark:border-white/5 flex items-center gap-6 shadow-sm">
-            <div className="w-12 h-16 bg-gray-50 dark:bg-black rounded-xl overflow-hidden shrink-0 border border-gray-100 dark:border-zinc-800 flex items-center justify-center text-rose-500 shadow-inner">{pdfData.thumbnail ? <img src={pdfData.thumbnail} className="w-full h-full object-cover" /> : <Scissors size={24} />}</div>
+          <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-3xl border border-pk-border dark:border-white/5 flex items-center gap-6 shadow-sm">
+            <div className="w-12 h-16 bg-pk-surface-muted dark:bg-zinc-950 rounded-xl overflow-hidden shrink-0 border border-pk-border dark:border-zinc-800 flex items-center justify-center text-rose-500 shadow-inner">{pdfData.thumbnail ? <img src={pdfData.thumbnail} className="w-full h-full object-cover" /> : <Scissors size={24} />}</div>
             <div className="flex-1 min-w-0 text-left">
               <h3 className="font-bold text-sm truncate dark:text-white">{pdfData.file.name}</h3>
               <p className="text-[10px] text-gray-400 uppercase font-black">{pdfData.pageCount} Pages • {(pdfData.file.size / (1024*1024)).toFixed(1)} MB</p>
@@ -272,7 +272,7 @@ export default function SplitTool() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-500">
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
                   <h4 className="font-black uppercase tracking-widest text-[10px] text-gray-400 px-2">Page Selection</h4>
                   <div className="flex gap-2">
@@ -300,12 +300,12 @@ export default function SplitTool() {
             </div>
 
             <div className="space-y-6">
-              <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm sticky top-24">
+              <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm sticky top-24">
                 <div className="space-y-6">
                   <div className="space-y-4">
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Split Mode</label>
-                      <div className="grid grid-cols-2 gap-2 bg-gray-50 dark:bg-black p-1 rounded-2xl">
+                      <div className="grid grid-cols-2 gap-2 bg-pk-surface-muted dark:bg-zinc-950 p-1 rounded-2xl">
                         <button onClick={() => { setSplitMode('single'); clearUrls(); }} className={`py-2 px-3 rounded-xl text-[9px] font-black uppercase transition-all ${splitMode === 'single' ? 'bg-white dark:bg-zinc-800 text-rose-500 shadow-sm' : 'text-gray-400'}`}>One Document</button>
                         <button onClick={() => { setSplitMode('individual'); clearUrls(); }} className={`py-2 px-3 rounded-xl text-[9px] font-black uppercase transition-all ${splitMode === 'individual' ? 'bg-white dark:bg-zinc-800 text-rose-500 shadow-sm' : 'text-gray-400'}`}>Separate Files</button>
                       </div>
@@ -316,7 +316,7 @@ export default function SplitTool() {
                     </div>
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Output Filename</label>
-                      <input type="text" value={customFileName} onChange={(e) => setCustomFileName(e.target.value)} className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" />
+                      <input type="text" value={customFileName} onChange={(e) => setCustomFileName(e.target.value)} className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" />
                     </div>
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Extract Page Range</label>
@@ -328,7 +328,7 @@ export default function SplitTool() {
                           value={startPage}
                           onChange={(e) => setStartPage(e.target.value)}
                           placeholder="Start"
-                          className="w-full bg-gray-50 dark:bg-black rounded-xl px-3 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white text-center"
+                          className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-3 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white text-center"
                         />
                         <span className="self-center text-[10px] font-black text-gray-400 uppercase">to</span>
                         <input
@@ -338,7 +338,7 @@ export default function SplitTool() {
                           value={endPage}
                           onChange={(e) => setEndPage(e.target.value)}
                           placeholder="End"
-                          className="w-full bg-gray-50 dark:bg-black rounded-xl px-3 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white text-center"
+                          className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-3 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white text-center"
                         />
                         <button onClick={applyStartEnd} className="px-4 bg-rose-500 text-white rounded-xl font-black text-[10px] uppercase active:scale-95 transition-transform shrink-0">Apply</button>
                       </div>
@@ -347,13 +347,13 @@ export default function SplitTool() {
                     <div>
                       <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Range Selection</label>
                       <div className="flex gap-2">
-                        <input type="text" value={rangeInput} onChange={(e) => setRangeInput(e.target.value)} placeholder="e.g. 1, 3-5" className="flex-1 bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" />
+                        <input type="text" value={rangeInput} onChange={(e) => setRangeInput(e.target.value)} placeholder="e.g. 1, 3-5" className="flex-1 bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" />
                         <button onClick={() => parseRange(rangeInput)} className="px-4 bg-rose-500 text-white rounded-xl font-black text-[10px] uppercase active:scale-95 transition-transform">Apply</button>
                       </div>
                       <p className="text-[8px] text-gray-400 mt-2 px-1">Use commas for separate pages and dashes for ranges.</p>
                     </div>
                   </div>
-                  <div className="pt-6 border-t border-gray-100 dark:border-white/5">
+                  <div className="pt-6 border-t border-pk-border dark:border-white/5">
                     <div className="flex justify-between items-end mb-4 px-1">
                       <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Selected</span>
                       <span className="text-xl font-black text-rose-500">{selectedPages.size} <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Pages</span></span>

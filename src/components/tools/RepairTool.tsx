@@ -67,14 +67,14 @@ export default function RepairTool() {
       <input type="file" accept=".pdf" className="hidden" ref={fileInputRef} onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
       
       {!originalFile ? (
-        <div onClick={() => !isProcessing && fileInputRef.current?.click()} className="border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group">
+        <div onClick={() => !isProcessing && fileInputRef.current?.click()} className="border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group">
           <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"><Upload size={32} /></div>
           <h3 className="text-xl font-bold dark:text-white mb-2">Select Corrupted PDF</h3>
           <p className="text-sm text-gray-400">Tap to browse local files</p>
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-gray-100 dark:border-white/5 flex items-center gap-6 shadow-sm">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-3xl border border-pk-border dark:border-white/5 flex items-center gap-6 shadow-sm">
             <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-2xl flex items-center justify-center shrink-0"><ShieldAlert size={24} /></div>
             <div className="flex-1 min-w-0 text-left">
               <h3 className="font-bold text-sm truncate dark:text-white">{originalFile.name}</h3>
@@ -83,7 +83,7 @@ export default function RepairTool() {
             <button onClick={() => setOriginalFile(null)} className="p-2 text-gray-400 hover:text-rose-500 transition-colors"><X size={20} /></button>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2rem] border border-gray-100 dark:border-white/5 space-y-8 shadow-sm">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2rem] border border-pk-border dark:border-white/5 space-y-8 shadow-sm">
             {!downloadUrl ? (
               <div className="space-y-6">
                 <div>
@@ -92,7 +92,7 @@ export default function RepairTool() {
                     type="text" 
                     value={customFileName} 
                     onChange={(e) => setCustomFileName(e.target.value)} 
-                    className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" 
+                    className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" 
                   />
                 </div>
               </div>

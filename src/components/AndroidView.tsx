@@ -28,7 +28,7 @@ import { PaperKnifeLogo } from './Logo'
 
 interface AndroidViewProps {
   theme: 'light' | 'dark'
-  toggleTheme: (e?: { clientX: number; clientY: number }) => void
+  toggleTheme: () => void
   onFileSelect?: (file: File) => void
 }
 
@@ -56,7 +56,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAFA] dark:bg-black transition-colors pb-44 text-left">
+    <div className="flex flex-col min-h-screen bg-pk-canvas pb-44 text-left">
       <input 
         type="file" 
         accept=".pdf" 
@@ -66,7 +66,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
       />
       
       {/* Minimal Header */}
-      <header className="px-6 pt-safe pb-2 sticky top-0 z-50 bg-[#FAFAFA]/95 dark:bg-black/95 backdrop-blur-xl border-b border-transparent">
+      <header className="px-6 pt-safe pb-2 sticky top-0 z-50 bg-[var(--pk-header)] backdrop-blur-xl border-b border-pk-border-subtle dark:border-transparent">
         <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
              <PaperKnifeLogo size={24} iconColor="#F43F5E" partColor="currentColor" />
@@ -81,7 +81,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
           
           <button 
             onClick={toggleTheme}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 dark:bg-zinc-900 text-gray-500 dark:text-gray-400 active:bg-gray-200 dark:active:bg-zinc-800 transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-stone-100 dark:bg-zinc-900 text-stone-500 dark:text-gray-400 active:bg-stone-200 dark:active:bg-zinc-800 transition-colors duration-200"
           >
             {theme === 'light' ? <MoonIcon size={18} /> : <SunIcon size={18} />}
           </button>
@@ -127,7 +127,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
                <button onClick={() => navigate('/android-history')} className="text-[9px] font-black uppercase text-rose-500 tracking-wider">View All</button>
             </div>
             
-            <div className="bg-white dark:bg-zinc-900 rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-sm divide-y divide-gray-50 dark:divide-white/10 overflow-hidden">
+            <div className="bg-pk-surface dark:bg-zinc-900 rounded-[2rem] border border-pk-border dark:border-white/10 shadow-pk-sm divide-y divide-pk-border-subtle dark:divide-white/10 overflow-hidden">
               {history.map((item) => (
                 <button 
                   key={item.id} 
@@ -163,7 +163,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
                 <button
                   key={action.title}
                   onClick={() => navigate(action.path)}
-                  className="p-5 bg-white dark:bg-zinc-900 rounded-[2rem] border border-gray-100 dark:border-white/10 flex flex-col justify-between h-32 shadow-sm active:bg-gray-50 dark:active:bg-white/5 transition-colors text-left relative overflow-hidden"
+                  className="p-5 pk-surface-card rounded-[2rem] flex flex-col justify-between h-32 active:bg-pk-surface-muted dark:active:bg-zinc-950 transition-colors text-left relative overflow-hidden"
                 >
                   <div className={`w-10 h-10 ${action.bg} ${action.color} rounded-xl flex items-center justify-center mb-2`}>
                     <action.icon size={20} strokeWidth={2.5} />

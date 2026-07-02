@@ -3,6 +3,7 @@ name: Build & Sign Android APK
 on:
   push:
     branches: [ main ]
+    tags: [ 'v*' ]
   workflow_dispatch:
 
 jobs:
@@ -103,6 +104,25 @@ jobs:
           name: PaperKnife-debug-v${{ steps.version.outputs.value }}
           path: debug-artifacts/paperknife-debug-v${{ steps.version.outputs.value }}.apk
           if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: PaperKnife ${{ github.ref_name }}
+          body: |
+            ## What's new in ${{ github.ref_name }}
+
+            See the [full changelog](https://github.com/${{ github.repository }}/compare/${{ github.event.before }}...${{ github.sha }}) on GitHub.
+
+            ### Install
+            Download `paperknife-debug-v${{ steps.version.outputs.value }}.apk` below and install it on your Android device. You may need to allow installs from unknown sources. This is a debug-signed build — uninstall any older debug build first if Android reports a package conflict.
+          files: debug-artifacts/paperknife-debug-v${{ steps.version.outputs.value }}.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Signed Release APKs
         if: env.HAS_SIGNING_KEY == 'true'

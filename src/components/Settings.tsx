@@ -65,7 +65,7 @@ const SettingItem = ({
 const SettingGroup = ({ title, children }: { title: string, children: React.ReactNode }) => (
   <div className="mb-6">
     <h3 className="px-6 mb-2 text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-zinc-600">{title}</h3>
-    <div className="bg-white dark:bg-zinc-900 rounded-[2.25rem] border border-gray-100 dark:border-white/5 divide-y divide-gray-50 dark:divide-white/5 shadow-sm overflow-hidden">
+    <div className="bg-pk-surface dark:bg-zinc-900 rounded-[2.25rem] border border-pk-border dark:border-white/5 divide-y divide-stone-100 dark:divide-white/5 shadow-pk-sm overflow-hidden">
       {children}
     </div>
   </div>
@@ -115,7 +115,7 @@ export default function Settings({ theme, setTheme }: { theme: Theme, setTheme: 
            </div>
            <div>
               <h2 className="text-xl font-black dark:text-white tracking-tighter leading-none mb-1">Preferences</h2>
-              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Protocol v1.2.0 • Local</p>
+              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Protocol v1.3.0 • Local</p>
            </div>
         </div>
 
@@ -133,7 +133,7 @@ export default function Settings({ theme, setTheme }: { theme: Theme, setTheme: 
                   setTheme(t.id as Theme)
                   hapticImpact()
                 }}
-                className={`flex flex-col items-center gap-2 py-3.5 rounded-[1.25rem] transition-all border border-transparent ${theme === t.id ? 'bg-zinc-950 dark:bg-white text-white dark:text-black shadow-xl scale-[1.02]' : 'bg-gray-50 dark:bg-black/40 text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800'}`}
+                className={`flex flex-col items-center gap-2 py-3.5 rounded-[1.25rem] transition-all border ${theme === t.id ? 'bg-stone-900 dark:bg-white text-white dark:text-black shadow-pk-md scale-[1.02] border-transparent' : 'bg-pk-surface-muted dark:bg-black/40 text-stone-400 border-pk-border-subtle dark:border-transparent hover:bg-stone-100 dark:hover:bg-zinc-800'}`}
               >
                 <t.icon size={18} strokeWidth={2.5} />
                 <span className="text-[9px] font-black uppercase tracking-[0.1em]">{t.label}</span>
@@ -169,7 +169,7 @@ export default function Settings({ theme, setTheme }: { theme: Theme, setTheme: 
                 localStorage.setItem('defaultAuthor', e.target.value)
               }}
               placeholder="e.g. Ankitkumar7217734"
-              className="w-full bg-gray-100 dark:bg-black border border-transparent focus:border-rose-500 rounded-xl px-4 py-3.5 text-xs font-black outline-none transition-all placeholder:text-gray-400 dark:text-white"
+              className="w-full bg-pk-surface-muted dark:bg-zinc-950 border border-pk-border-subtle dark:border-transparent focus:border-rose-500 rounded-xl px-4 py-3.5 text-xs font-black outline-none transition-all placeholder:text-stone-400 dark:text-white"
             />
           </div>
         </SettingGroup>
@@ -211,7 +211,7 @@ export default function Settings({ theme, setTheme }: { theme: Theme, setTheme: 
              <select 
               value={historyLimit}
               onChange={(e) => handleSelect('historyLimit', e.target.value, setHistoryLimit)}
-              className="bg-gray-100 dark:bg-black px-3 py-2 rounded-xl text-[11px] font-black text-gray-600 dark:text-gray-300 outline-none border border-transparent focus:border-rose-500 cursor-pointer"
+              className="bg-pk-surface-muted dark:bg-zinc-950 px-3 py-2 rounded-xl text-[11px] font-black text-stone-600 dark:text-gray-300 outline-none border border-pk-border-subtle dark:border-transparent focus:border-rose-500 cursor-pointer"
              >
                 <option value="5">5 Files</option>
                 <option value="10">10 Files</option>
@@ -276,7 +276,7 @@ export default function Settings({ theme, setTheme }: { theme: Theme, setTheme: 
                 }}
               />
            </div>
-           <p className="text-[8px] font-black uppercase text-center text-gray-300 dark:text-zinc-700 tracking-[0.5em] mt-10">Configuration Engine v1.2.0 Stable</p>
+           <p className="text-[8px] font-black uppercase text-center text-gray-300 dark:text-zinc-700 tracking-[0.5em] mt-10">Configuration Engine v1.3.0 Stable</p>
         </div>
 
       </div>

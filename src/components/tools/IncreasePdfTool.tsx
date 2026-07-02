@@ -193,7 +193,7 @@ export default function IncreasePdfTool() {
       {!sourceFile ? (
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="w-full border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
+          className="w-full border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
         >
           <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-inner">
             <Expand size={32} />
@@ -203,8 +203,8 @@ export default function IncreasePdfTool() {
         </button>
       ) : (
         <div className="space-y-6 animate-in fade-in duration-500">
-          <div className="bg-white dark:bg-zinc-900 p-4 rounded-[1.5rem] border border-gray-100 dark:border-white/5 flex items-center gap-4 shadow-sm">
-            <div className="w-12 h-16 bg-gray-50 dark:bg-black rounded-lg overflow-hidden shrink-0 border border-gray-100 dark:border-zinc-800 flex items-center justify-center">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-4 rounded-[1.5rem] border border-pk-border dark:border-white/5 flex items-center gap-4 shadow-sm">
+            <div className="w-12 h-16 bg-pk-surface-muted dark:bg-zinc-950 rounded-lg overflow-hidden shrink-0 border border-pk-border dark:border-zinc-800 flex items-center justify-center">
               {thumbnail ? <img src={thumbnail} className="w-full h-full object-cover" /> : <FileIcon className="text-gray-300" size={16} />}
             </div>
             <div className="flex-1 min-w-0 text-left">
@@ -220,7 +220,7 @@ export default function IncreasePdfTool() {
             </button>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 p-6 md:p-8 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm space-y-6">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-6 md:p-8 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm space-y-6">
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 px-1">Target File Size</label>
               <div className="flex items-center gap-2">
@@ -231,9 +231,9 @@ export default function IncreasePdfTool() {
                   placeholder="e.g. 2"
                   value={targetValue}
                   onChange={(e) => setTargetValue(e.target.value)}
-                  className="flex-1 bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-lg dark:text-white"
+                  className="flex-1 bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-lg dark:text-white"
                 />
-                <div className="grid grid-cols-2 gap-1 bg-gray-50 dark:bg-black p-1 rounded-xl">
+                <div className="grid grid-cols-2 gap-1 bg-pk-surface-muted dark:bg-zinc-950 p-1 rounded-xl">
                   {(['KB', 'MB'] as Unit[]).map((u) => (
                     <button
                       key={u}
@@ -248,15 +248,15 @@ export default function IncreasePdfTool() {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-gray-50 dark:bg-black rounded-xl p-4">
+              <div className="bg-pk-surface-muted dark:bg-zinc-950 rounded-xl p-4">
                 <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Current</p>
                 <p className="text-sm font-black dark:text-white">{humanSize(currentBytes)}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-black rounded-xl p-4">
+              <div className="bg-pk-surface-muted dark:bg-zinc-950 rounded-xl p-4">
                 <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Target</p>
                 <p className="text-sm font-black dark:text-white">{numericTarget > 0 ? humanSize(targetBytes) : '—'}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-black rounded-xl p-4">
+              <div className="bg-pk-surface-muted dark:bg-zinc-950 rounded-xl p-4">
                 <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Added</p>
                 <p className={`text-sm font-black ${isValidTarget ? 'text-emerald-500' : 'text-rose-500'}`}>
                   {numericTarget > 0 ? (addedBytes > 0 ? `+${humanSize(addedBytes)}` : 'Too small') : '—'}
@@ -271,7 +271,7 @@ export default function IncreasePdfTool() {
             )}
 
             {objectUrl && (
-              <div className="pt-5 border-t border-gray-100 dark:border-white/5">
+              <div className="pt-5 border-t border-pk-border dark:border-white/5">
                 <SuccessState
                   message={`PDF padded to ${humanSize(targetBytes)}`}
                   downloadUrl={objectUrl}

@@ -114,36 +114,36 @@ export default function PdfToTextTool() {
     <NativeToolLayout title="PDF to Text" description="Extract text using fast scan or deep local OCR." actions={pdfData && !pdfData.isLocked && !extractedText && <ActionButton />}>
       <input type="file" accept=".pdf" className="hidden" ref={fileInputRef} onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
       {!pdfData ? (
-        <div onClick={() => !isProcessing && fileInputRef.current?.click()} className="border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group">
+        <div onClick={() => !isProcessing && fileInputRef.current?.click()} className="border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group">
           <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"><FileText size={32} /></div>
           <h3 className="text-xl font-bold dark:text-white mb-2">Select PDF</h3>
           <p className="text-sm text-gray-400">Tap to browse files</p>
         </div>
       ) : pdfData.isLocked ? (
         <div className="max-w-md mx-auto">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 text-center">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-pk-border dark:border-white/5 text-center">
             <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6"><Lock size={32} /></div>
             <h3 className="text-2xl font-bold mb-2 dark:text-white">Protected File</h3>
-            <input type="password" value={unlockPassword} onChange={(e) => setUnlockPassword(e.target.value)} placeholder="Password" className="w-full bg-gray-50 dark:bg-black rounded-2xl px-6 py-4 border border-transparent focus:border-rose-500 outline-none font-bold text-center mb-4" />
+            <input type="password" value={unlockPassword} onChange={(e) => setUnlockPassword(e.target.value)} placeholder="Password" className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-2xl px-6 py-4 border border-transparent focus:border-rose-500 outline-none font-bold text-center mb-4" />
             <button onClick={handleUnlock} disabled={!unlockPassword || isProcessing} className="w-full bg-rose-500 text-white p-4 rounded-2xl font-black uppercase text-xs">Unlock</button>
           </div>
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-gray-100 dark:border-white/5 flex items-center gap-6">
-            <div className="w-16 h-20 bg-gray-50 dark:bg-black rounded-xl border border-gray-100 dark:border-zinc-800 flex items-center justify-center text-rose-500"><FileText size={24} /></div>
+          <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-3xl border border-pk-border dark:border-white/5 flex items-center gap-6">
+            <div className="w-16 h-20 bg-pk-surface-muted dark:bg-zinc-950 rounded-xl border border-pk-border dark:border-zinc-800 flex items-center justify-center text-rose-500"><FileText size={24} /></div>
             <div className="flex-1 min-w-0"><h3 className="font-bold text-sm truncate dark:text-white">{pdfData.file.name}</h3><p className="text-[10px] text-gray-400 uppercase font-black">{pdfData.pageCount} Pages • {(pdfData.file.size / (1024*1024)).toFixed(1)} MB</p></div>
             <button onClick={() => setPdfData(null)} className="p-2 text-gray-400 hover:text-rose-500"><X size={20} /></button>
           </div>
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2rem] border border-gray-100 dark:border-white/5 space-y-8 shadow-sm">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2rem] border border-pk-border dark:border-white/5 space-y-8 shadow-sm">
             {!extractedText ? (
               <>
                 <div className="grid grid-cols-2 gap-3">
-                  <button onClick={() => setExtractionMode('text')} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center ${extractionMode === 'text' ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-900/10' : 'border-gray-100 dark:border-white/5'}`}><Zap size={20} className={extractionMode === 'text' ? 'text-rose-500' : 'text-gray-400'} /><span className="font-black uppercase text-[10px] mt-1">Fast Scan</span></button>
+                  <button onClick={() => setExtractionMode('text')} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center ${extractionMode === 'text' ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-900/10' : 'border-pk-border dark:border-white/5'}`}><Zap size={20} className={extractionMode === 'text' ? 'text-rose-500' : 'text-gray-400'} /><span className="font-black uppercase text-[10px] mt-1">Fast Scan</span></button>
                   <button 
                     onClick={() => !isOcrDisabled && setExtractionMode('ocr')} 
                     disabled={isOcrDisabled}
-                    className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center ${extractionMode === 'ocr' ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-900/10' : 'border-gray-100 dark:border-white/5'} ${isOcrDisabled ? 'opacity-40 grayscale grayscale-mask' : ''}`}
+                    className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center ${extractionMode === 'ocr' ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-900/10' : 'border-pk-border dark:border-white/5'} ${isOcrDisabled ? 'opacity-40 grayscale grayscale-mask' : ''}`}
                   >
                     <ScanSearch size={20} className={extractionMode === 'ocr' ? 'text-rose-500' : 'text-gray-400'} />
                     <span className="font-black uppercase text-[10px] mt-1">{isOcrDisabled ? 'No OCR' : 'Deep OCR'}</span>
@@ -155,7 +155,7 @@ export default function PdfToTextTool() {
                 {!isProcessing && (
                   <div className="space-y-4">
                     {isOcrDisabled && (
-                      <div className="p-4 bg-gray-50 dark:bg-zinc-900/50 rounded-xl border border-gray-100 dark:border-white/5">
+                      <div className="p-4 bg-gray-50 dark:bg-zinc-900/50 rounded-xl border border-pk-border dark:border-white/5">
                          <p className="text-[9px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider text-center">
                             Deep OCR is disabled in this F-Droid build to comply with non-binary policies. Use 'Fast Scan' or get the full version from GitHub.
                          </p>
@@ -177,7 +177,7 @@ export default function PdfToTextTool() {
                         type="text" 
                         value={customFileName} 
                         onChange={(e) => setCustomFileName(e.target.value)} 
-                        className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" 
+                        className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" 
                       />
                     </div>
                   </div>
@@ -185,9 +185,9 @@ export default function PdfToTextTool() {
               </>
             ) : (
               <div className="space-y-6">
-                <textarea readOnly value={extractedText} className="w-full h-80 bg-gray-50 dark:bg-black border border-gray-100 dark:border-white/5 rounded-2xl p-4 font-mono text-[10px] resize-none outline-none focus:border-rose-500 dark:text-gray-300 shadow-inner" />
+                <textarea readOnly value={extractedText} className="w-full h-80 bg-pk-surface-muted dark:bg-zinc-950 border border-pk-border dark:border-white/5 rounded-2xl p-4 font-mono text-[10px] resize-none outline-none focus:border-rose-500 dark:text-gray-300 shadow-inner" />
                 <div className="flex gap-3">
-                  <button onClick={() => { navigator.clipboard.writeText(extractedText); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="flex-1 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white border border-gray-100 dark:border-white/5 p-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95">{copied ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />} Copy</button>
+                  <button onClick={() => { navigator.clipboard.writeText(extractedText); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="flex-1 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white border border-pk-border dark:border-white/5 p-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95">{copied ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />} Copy</button>
                   <button onClick={handleDownload} className="flex-[2] bg-gray-900 dark:bg-white text-white dark:text-black p-4 rounded-2xl font-black flex items-center justify-center gap-2 shadow-xl active:scale-95 transition-all"><Download size={18} /> {isNative ? 'Save .txt' : 'Download'}</button>
                 </div>
                 <button onClick={() => { setExtractedText(''); setProgress(0); setPdfData(null); }} className="w-full py-2 text-gray-400 uppercase font-black text-[10px] hover:text-rose-500 transition-colors">Close File</button>

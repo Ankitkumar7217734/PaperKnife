@@ -30,7 +30,7 @@ import { hapticImpact } from '../utils/haptics'
 interface LayoutProps {
   children: React.ReactNode
   theme: Theme
-  toggleTheme: (e?: { clientX: number; clientY: number }) => void
+  toggleTheme: () => void
   tools: Tool[]
   onFileDrop?: (files: FileList) => void
   viewMode: ViewMode
@@ -119,7 +119,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
   const shouldShowNav = showMobileNav && isMainView && !activeTool
 
   return (
-    <div className={`min-h-screen flex flex-col bg-[#FAFAFA] dark:bg-black text-gray-900 dark:text-zinc-100 transition-colors duration-300`}>
+    <div className="min-h-screen flex flex-col bg-pk-canvas text-stone-900 dark:text-zinc-100">
       
       {isDragging && (
         <div className="fixed inset-0 z-[200] bg-rose-500/10 backdrop-blur-sm flex items-center justify-center pointer-events-none">
@@ -132,7 +132,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
 
       {/* Web Header */}
       {!showMobileNav && (
-        <header className="flex items-center justify-between px-4 md:px-8 h-16 md:h-20 border-b border-gray-100 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-[100]">
+        <header className="flex items-center justify-between px-4 md:px-8 h-16 md:h-20 border-b border-pk-border dark:border-zinc-800 bg-[var(--pk-header)] backdrop-blur-xl sticky top-0 z-[100] shadow-pk-sm dark:shadow-none">
           <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
             {!isHome && (
               <button onClick={() => navigate('/')} aria-label="Go back to home" className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 rounded-xl transition-colors text-gray-500 hover:text-rose-500 shrink-0"><ArrowLeftIcon size={20} /></button>
@@ -187,7 +187,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
               <InfoIcon size={18} />
               <span className="hidden sm:block">About</span>
             </Link>
-            <button onClick={toggleTheme} aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'} className="p-2 text-gray-400 hover:text-rose-500 transition-colors">
+            <button onClick={toggleTheme} aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'} className="p-2.5 rounded-xl text-stone-400 hover:text-rose-500 hover:bg-stone-100 dark:hover:bg-zinc-900 transition-colors duration-200">
               {theme === 'light' ? <MoonIcon size={20} /> : <SunIcon size={20} />}
             </button>
             <button onClick={() => setShowHistory(true)} aria-label="Recent activity" className={`p-2 transition-colors relative ${showHistory ? 'text-rose-500' : 'text-gray-400 hover:text-rose-500'}`}>
@@ -204,7 +204,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
 
       {/* Web Footer - Modern Compact Design */}
       {!showMobileNav && (
-        <footer className="border-t border-gray-100 dark:border-white/5 mt-20 bg-white dark:bg-black relative z-10">
+        <footer className="border-t border-pk-border dark:border-white/5 mt-20 bg-[var(--pk-footer)] dark:bg-black relative z-10">
           <div className="max-w-7xl mx-auto px-6 md:px-8 py-10 md:py-12">
             
             <div className="grid grid-cols-2 md:grid-cols-12 gap-8 mb-12">
@@ -228,12 +228,22 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
                      <GHIcon size={14} />
                    </a>
                 </div>
-                <a
-                  href="https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.2.0/paperknife-debug-v1.2.0.apk"
-                  className="inline-flex items-center gap-2.5 px-5 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-rose-500/20"
-                >
-                  <SmartphoneIcon size={14} /> Download Android App (APK)
-                </a>
+                <div className="flex flex-col gap-2">
+                  <a
+                    href="https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.3.0/paperknife-debug-v1.3.0.apk"
+                    className="inline-flex items-center gap-2.5 px-5 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-rose-500/20 w-fit"
+                  >
+                    <SmartphoneIcon size={14} /> Download Android App v1.3.0
+                  </a>
+                  <a
+                    href="https://github.com/Ankitkumar7217734/PaperKnife/releases"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-rose-500 transition-colors w-fit"
+                  >
+                    All previous APK releases →
+                  </a>
+                </div>
               </div>
 
               {/* Legal Column */}
@@ -270,7 +280,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
 
       {/* Titan Bottom Navigation (Solid, Grounded) */}
       {shouldShowNav && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t border-gray-100 dark:border-zinc-800 flex items-end justify-between px-6 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3 z-[100] shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
+        <nav className="fixed bottom-0 left-0 right-0 pk-bottom-bar flex items-end justify-between px-6 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3 z-[100] shadow-[0_-4px_20px_rgba(28,25,23,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
           <button 
             onClick={() => navigate('/')}
             className={`flex flex-col items-center gap-1.5 flex-1 transition-all ${location.pathname === '/' ? 'text-rose-500' : 'text-gray-400 dark:text-zinc-600'}`}
@@ -301,7 +311,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
                  }
                  input.click()
                }}
-               className="w-14 h-14 bg-rose-500 text-white rounded-2xl shadow-xl shadow-rose-500/40 flex items-center justify-center active:scale-90 transition-transform ring-4 ring-white dark:ring-black"
+               className="w-14 h-14 bg-rose-500 text-white rounded-2xl shadow-xl shadow-rose-500/40 flex items-center justify-center active:scale-90 transition-transform ring-4 ring-pk-surface dark:ring-zinc-950"
              >
                <PlusIcon size={32} strokeWidth={3} />
              </button>
@@ -326,7 +336,7 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
       )}
 
       {/* Sidebar History Drawer */}
-      <aside className={`fixed top-0 right-0 h-screen w-full sm:w-80 bg-white dark:bg-zinc-950 border-l border-gray-100 dark:border-zinc-800 z-[150] shadow-2xl transition-transform duration-500 ease-out transform ${showHistory ? 'translate-x-0' : 'translate-x-full'}`}>
+      <aside className={`fixed top-0 right-0 h-screen w-full sm:w-80 bg-pk-surface dark:bg-zinc-950 border-l border-pk-border dark:border-zinc-800 z-[150] shadow-pk-lg transition-transform duration-500 ease-out transform ${showHistory ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-6 h-full flex flex-col">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">

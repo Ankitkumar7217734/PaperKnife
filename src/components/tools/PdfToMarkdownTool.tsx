@@ -143,7 +143,7 @@ export default function PdfToMarkdownTool() {
       {!pdfData ? (
         <div
           onClick={() => !isProcessing && fileInputRef.current?.click()}
-          className="border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
+          className="border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
         >
           <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
             <FileCode size={32} />
@@ -153,7 +153,7 @@ export default function PdfToMarkdownTool() {
         </div>
       ) : pdfData.isLocked ? (
         <div className="max-w-md mx-auto">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 text-center">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-pk-border dark:border-white/5 text-center">
             <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <Lock size={32} />
             </div>
@@ -163,7 +163,7 @@ export default function PdfToMarkdownTool() {
               value={unlockPassword}
               onChange={(e) => setUnlockPassword(e.target.value)}
               placeholder="Password"
-              className="w-full bg-gray-50 dark:bg-black rounded-2xl px-6 py-4 border border-transparent focus:border-rose-500 outline-none font-bold text-center mb-4"
+              className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-2xl px-6 py-4 border border-transparent focus:border-rose-500 outline-none font-bold text-center mb-4"
             />
             <button
               onClick={handleUnlock}
@@ -176,8 +176,8 @@ export default function PdfToMarkdownTool() {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-gray-100 dark:border-white/5 flex items-center gap-6">
-            <div className="w-16 h-20 bg-gray-50 dark:bg-black rounded-xl border border-gray-100 dark:border-zinc-800 flex items-center justify-center text-rose-500">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-3xl border border-pk-border dark:border-white/5 flex items-center gap-6">
+            <div className="w-16 h-20 bg-pk-surface-muted dark:bg-zinc-950 rounded-xl border border-pk-border dark:border-zinc-800 flex items-center justify-center text-rose-500">
               <FileCode size={24} />
             </div>
             <div className="flex-1 min-w-0">
@@ -191,7 +191,7 @@ export default function PdfToMarkdownTool() {
             </button>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2rem] border border-gray-100 dark:border-white/5 space-y-8 shadow-sm">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2rem] border border-pk-border dark:border-white/5 space-y-8 shadow-sm">
             {!extractedMarkdown ? (
               <>
                 <div className="p-4 rounded-2xl border-2 border-rose-500 bg-rose-50/50 dark:bg-rose-900/10 flex flex-col items-center">
@@ -228,7 +228,7 @@ export default function PdfToMarkdownTool() {
                         type="text"
                         value={customFileName}
                         onChange={(e) => setCustomFileName(e.target.value)}
-                        className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white"
+                        className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white"
                       />
                     </div>
                   </div>
@@ -239,7 +239,7 @@ export default function PdfToMarkdownTool() {
                 <textarea
                   readOnly
                   value={extractedMarkdown}
-                  className="w-full h-80 bg-gray-50 dark:bg-black border border-gray-100 dark:border-white/5 rounded-2xl p-4 font-mono text-[10px] resize-none outline-none focus:border-rose-500 dark:text-gray-300 shadow-inner"
+                  className="w-full h-80 bg-pk-surface-muted dark:bg-zinc-950 border border-pk-border dark:border-white/5 rounded-2xl p-4 font-mono text-[10px] resize-none outline-none focus:border-rose-500 dark:text-gray-300 shadow-inner"
                 />
                 <div className="flex gap-3">
                   <button
@@ -248,7 +248,7 @@ export default function PdfToMarkdownTool() {
                       setCopied(true)
                       setTimeout(() => setCopied(false), 2000)
                     }}
-                    className="flex-1 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white border border-gray-100 dark:border-white/5 p-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95"
+                    className="flex-1 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white border border-pk-border dark:border-white/5 p-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95"
                   >
                     {copied ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />} Copy
                   </button>

@@ -75,7 +75,7 @@ function LayoutPreview({ preset, margin, gap, pageW, pageH, thumbnail }: Preview
   }
 
   return (
-    <div className="w-full bg-gray-50 dark:bg-black rounded-2xl p-6 flex items-center justify-center">
+    <div className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-2xl p-6 flex items-center justify-center">
       <svg
         viewBox={`0 0 ${sheetW} ${sheetH}`}
         className="max-h-[420px] w-auto h-auto max-w-full"
@@ -280,7 +280,7 @@ export default function NUpTool() {
       {!pdfData ? (
         <button
           onClick={() => !isLoadingMeta && fileInputRef.current?.click()}
-          className={`w-full border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group ${isLoadingMeta ? 'opacity-50 cursor-wait' : ''}`}
+          className={`w-full border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group ${isLoadingMeta ? 'opacity-50 cursor-wait' : ''}`}
         >
           {isLoadingMeta ? (
             <div className="flex flex-col items-center">
@@ -299,7 +299,7 @@ export default function NUpTool() {
         </button>
       ) : pdfData.isLocked ? (
         <div className="max-w-md mx-auto relative z-[100]">
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-2xl text-center">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-pk-border dark:border-white/5 shadow-2xl text-center">
             <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
               <Lock size={32} />
             </div>
@@ -309,7 +309,7 @@ export default function NUpTool() {
               value={unlockPassword}
               onChange={(e) => setUnlockPassword(e.target.value)}
               placeholder="Enter Password"
-              className="w-full bg-gray-50 dark:bg-black rounded-2xl px-6 py-4 border border-transparent focus:border-rose-500 outline-none font-bold text-center mb-4 dark:text-white"
+              className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-2xl px-6 py-4 border border-transparent focus:border-rose-500 outline-none font-bold text-center mb-4 dark:text-white"
               autoFocus
             />
             <button
@@ -323,8 +323,8 @@ export default function NUpTool() {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-gray-100 dark:border-white/5 flex items-center gap-6 shadow-sm">
-            <div className="w-12 h-16 bg-gray-50 dark:bg-black rounded-xl overflow-hidden shrink-0 border border-gray-100 dark:border-zinc-800 flex items-center justify-center text-rose-500 shadow-inner">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-3xl border border-pk-border dark:border-white/5 flex items-center gap-6 shadow-sm">
+            <div className="w-12 h-16 bg-pk-surface-muted dark:bg-zinc-950 rounded-xl overflow-hidden shrink-0 border border-pk-border dark:border-zinc-800 flex items-center justify-center text-rose-500 shadow-inner">
               {pdfData.thumbnail ? <img src={pdfData.thumbnail} className="w-full h-full object-cover" /> : <LayoutGrid size={24} />}
             </div>
             <div className="flex-1 min-w-0 text-left">
@@ -340,7 +340,7 @@ export default function NUpTool() {
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 animate-in fade-in duration-500 items-start">
             <div className="lg:col-span-3 space-y-6">
-              <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm">
                 <h4 className="font-black uppercase tracking-widest text-[10px] text-gray-400 px-2 mb-4">Layout</h4>
                 <div className="grid grid-cols-3 gap-3">
                   {(Object.keys(LAYOUTS) as unknown as NUpPreset[]).map((rawKey) => {
@@ -351,7 +351,7 @@ export default function NUpTool() {
                       <button
                         key={key}
                         onClick={() => { setPreset(key); clearUrls() }}
-                        className={`aspect-square rounded-2xl p-3 border-2 transition-all flex flex-col items-center justify-center gap-2 ${selected ? 'border-rose-500 bg-rose-50 dark:bg-rose-900/20' : 'border-transparent bg-gray-50 dark:bg-black hover:border-gray-200 dark:hover:border-zinc-800'}`}
+                        className={`aspect-square rounded-2xl p-3 border-2 transition-all flex flex-col items-center justify-center gap-2 ${selected ? 'border-rose-500 bg-rose-50 dark:bg-rose-900/20' : 'border-transparent bg-pk-surface-muted dark:bg-zinc-950 hover:border-gray-200 dark:hover:border-zinc-800'}`}
                       >
                         <div
                           className="grid gap-1 w-12 h-12"
@@ -370,7 +370,7 @@ export default function NUpTool() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm">
                 <div className="flex items-center justify-between mb-4 px-2">
                   <h4 className="font-black uppercase tracking-widest text-[10px] text-gray-400">Live Preview</h4>
                   <span className="text-[10px] text-gray-400 font-bold">
@@ -395,7 +395,7 @@ export default function NUpTool() {
             </div>
 
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm lg:sticky lg:top-24">
+              <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm lg:sticky lg:top-24">
                 <div className="space-y-5">
                   <div>
                     <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Output Filename</label>
@@ -403,7 +403,7 @@ export default function NUpTool() {
                       type="text"
                       value={customFileName}
                       onChange={(e) => setCustomFileName(e.target.value)}
-                      className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white"
+                      className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white"
                     />
                   </div>
                   <div>
@@ -430,7 +430,7 @@ export default function NUpTool() {
                   </div>
 
                   {objectUrl && (
-                    <div className="pt-5 border-t border-gray-100 dark:border-white/5">
+                    <div className="pt-5 border-t border-pk-border dark:border-white/5">
                       <SuccessState
                         message="N-up Successful!"
                         downloadUrl={objectUrl}

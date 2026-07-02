@@ -1,0 +1,1 @@
+New PDF to Markdown tool. Improved light and dark theme across web and Android.

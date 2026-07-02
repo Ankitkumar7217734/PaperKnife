@@ -52,13 +52,13 @@ const QualityCompare = ({ originalBuffer, compressedBuffer }: { originalBuffer: 
       <div className="flex justify-between items-center px-2">
         <h4 className="text-[10px] font-black uppercase text-gray-400 flex items-center gap-2"><Maximize2 size={12} /> Quality Inspection</h4>
       </div>
-      <div ref={containerRef} className="relative h-80 md:h-[400px] rounded-[2rem] overflow-hidden cursor-ew-resize select-none border border-gray-100 dark:border-white/5" onMouseMove={handleMove} onTouchMove={handleMove}>
+      <div ref={containerRef} className="relative h-80 md:h-[400px] rounded-[2rem] overflow-hidden cursor-ew-resize select-none border border-pk-border dark:border-white/5" onMouseMove={handleMove} onTouchMove={handleMove}>
         <img src={compressedThumb} className="absolute inset-0 w-full h-full object-contain bg-white" alt="Compressed" />
         <div className="absolute inset-0 w-full h-full overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}>
           <img src={originalThumb} className="absolute inset-0 w-full h-full object-contain bg-white" alt="Original" />
         </div>
         <div className="absolute top-0 bottom-0 w-1 bg-white shadow-xl z-10" style={{ left: `${sliderPos}%` }}>
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-white dark:bg-zinc-900 rounded-full shadow-2xl border border-gray-100 dark:border-white/5 flex items-center justify-center text-rose-500">
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-pk-surface dark:bg-zinc-900 rounded-full shadow-2xl border border-pk-border dark:border-white/5 flex items-center justify-center text-rose-500">
              <ChevronLeft size={14} /><ChevronRight size={14} />
           </div>
         </div>
@@ -245,7 +245,7 @@ export default function CompressTool() {
       {files.length === 0 ? (
         <button 
           onClick={() => !isProcessing && fileInputRef.current?.click()} 
-          className="w-full border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
+          className="w-full border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
         >
           <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-inner"><Zap size={32} /></div>
           <h3 className="text-xl font-bold dark:text-white mb-2">Select PDFs</h3>
@@ -255,27 +255,27 @@ export default function CompressTool() {
         <div className="space-y-6 animate-in fade-in duration-500">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {files.map(f => (
-              <div key={f.id} className="bg-white dark:bg-zinc-900 p-4 rounded-[1.5rem] border border-gray-100 dark:border-white/5 flex items-center gap-4 relative group shadow-sm">
-                <div className="w-12 h-16 bg-gray-50 dark:bg-black rounded-lg overflow-hidden shrink-0 border border-gray-100 dark:border-zinc-800">
+              <div key={f.id} className="bg-pk-surface dark:bg-zinc-900 p-4 rounded-[1.5rem] border border-pk-border dark:border-white/5 flex items-center gap-4 relative group shadow-sm">
+                <div className="w-12 h-16 bg-pk-surface-muted dark:bg-zinc-950 rounded-lg overflow-hidden shrink-0 border border-pk-border dark:border-zinc-800">
                   {f.thumbnail ? <img src={f.thumbnail} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><FileIcon className="text-gray-300" size={16} /></div>}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-black truncate dark:text-white">{f.file.name}</p>
                   {f.isLocked ? (
                     <div className="flex gap-1 mt-1">
-                       <input type="password" placeholder="Locked..." className="flex-1 bg-gray-50 dark:bg-black text-[10px] p-1.5 rounded-lg outline-none w-full border border-gray-100 dark:border-zinc-800 focus:border-rose-500" onKeyDown={(e) => { if(e.key === 'Enter') handleUnlock(f.id, e.currentTarget.value) }} />
+                       <input type="password" placeholder="Locked..." className="flex-1 bg-pk-surface-muted dark:bg-zinc-950 text-[10px] p-1.5 rounded-lg outline-none w-full border border-pk-border dark:border-zinc-800 focus:border-rose-500" onKeyDown={(e) => { if(e.key === 'Enter') handleUnlock(f.id, e.currentTarget.value) }} />
                     </div>
                   ) : <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{(f.file.size / (1024*1024)).toFixed(2)} MB • {f.pageCount} Pages</p>}
                 </div>
                 <button onClick={() => setFiles(prev => prev.filter(item => item.id !== f.id))} className="p-2 text-gray-300 hover:text-rose-500 transition-colors"><X size={16} /></button>
               </div>
             ))}
-            <button onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-gray-100 dark:border-zinc-800 rounded-[1.5rem] p-4 text-gray-400 flex flex-col items-center justify-center gap-1 hover:border-rose-500 hover:text-rose-500 transition-all">
+            <button onClick={() => fileInputRef.current?.click()} className="border-2 border-dashed border-pk-border dark:border-zinc-800 rounded-[1.5rem] p-4 text-gray-400 flex flex-col items-center justify-center gap-1 hover:border-rose-500 hover:text-rose-500 transition-all">
               <Plus size={20} /><span className="text-[10px] font-black uppercase tracking-widest">Add More</span>
             </button>
           </div>
 
-          <div className="bg-white dark:bg-zinc-900 p-8 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm">
             <h4 className="text-[10px] font-black uppercase text-gray-400 mb-6 tracking-widest px-1">Compression Strategy</h4>
             <div className="grid grid-cols-3 gap-3">
               {[
@@ -283,14 +283,14 @@ export default function CompressTool() {
                 { id: 'medium', label: 'Standard', desc: 'Recommended' },
                 { id: 'low', label: 'Smallest', desc: 'Max Save' }
               ].map((lvl) => (
-                <button key={lvl.id} onClick={() => setQuality(lvl.id as CompressionQuality)} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${quality === lvl.id ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-900/10' : 'border-gray-100 dark:border-white/5'}`}>
+                <button key={lvl.id} onClick={() => setQuality(lvl.id as CompressionQuality)} className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${quality === lvl.id ? 'border-rose-500 bg-rose-50/50 dark:bg-rose-900/10' : 'border-pk-border dark:border-white/5'}`}>
                   <span className={`font-black uppercase text-[9px] text-center leading-tight ${quality === lvl.id ? 'text-rose-500' : 'text-gray-400'}`}>{lvl.label}</span>
                   <span className="text-[8px] text-gray-400 font-bold uppercase">{lvl.desc}</span>
                 </button>
               ))}
             </div>
             
-            <div className="mt-6 p-6 bg-gray-50 dark:bg-black rounded-2xl border border-gray-100 dark:border-white/5">
+            <div className="mt-6 p-6 bg-pk-surface-muted dark:bg-zinc-950 rounded-2xl border border-pk-border dark:border-white/5">
                <div className="flex items-center gap-3 mb-3">
                  <div className="w-8 h-8 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center">
                    <Zap size={16} />
@@ -343,7 +343,7 @@ export default function CompressTool() {
           )}
           {objectUrl && files.length === 1 && (
             <div className="space-y-8">
-              {lastPipelinedFile?.originalBuffer && lastPipelinedFile?.buffer && <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-sm"><QualityCompare originalBuffer={lastPipelinedFile.originalBuffer} compressedBuffer={lastPipelinedFile.buffer} /></div>}
+              {lastPipelinedFile?.originalBuffer && lastPipelinedFile?.buffer && <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-[2.5rem] border border-pk-border dark:border-white/5 shadow-sm"><QualityCompare originalBuffer={lastPipelinedFile.originalBuffer} compressedBuffer={lastPipelinedFile.buffer} /></div>}
               <SuccessState message={`Reduced by ${((1 - (files[0].resultSize || 0) / files[0].file.size) * 100).toFixed(0)}%`} downloadUrl={objectUrl} fileName={files[0].file.name.replace('.pdf', '-compressed.pdf')} onStartOver={() => { setFiles([]); setShowSuccess(false); clearUrls(); setIsProcessing(false); }} />
             </div>
           )}

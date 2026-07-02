@@ -84,18 +84,18 @@ export default function SignatureTool() {
       {!pdfData ? (
         <button 
           onClick={() => !isProcessing && fileInputRef.current?.click()} 
-          className="w-full border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 transition-all cursor-pointer group"
+          className="w-full border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 transition-all cursor-pointer group"
         >
           <ImageIcon size={32} className="mx-auto mb-4 text-rose-500" />
           <h3 className="text-xl font-bold dark:text-white">Select PDF</h3>
         </button>
       ) : pdfData.isLocked ? (
-        <div className="max-w-md mx-auto p-8 bg-white dark:bg-zinc-900 rounded-3xl text-center"><Lock size={32} className="mx-auto mb-4 text-rose-500" /><input type="password" value={unlockPassword} onChange={(e) => setUnlockPassword(e.target.value)} className="w-full p-4 mb-4 border rounded-xl" /><button onClick={handleUnlock} className="w-full p-4 bg-rose-500 text-white rounded-xl">Unlock</button></div>
+        <div className="max-w-md mx-auto p-8 bg-pk-surface dark:bg-zinc-900 rounded-3xl text-center"><Lock size={32} className="mx-auto mb-4 text-rose-500" /><input type="password" value={unlockPassword} onChange={(e) => setUnlockPassword(e.target.value)} className="w-full p-4 mb-4 border rounded-xl" /><button onClick={handleUnlock} className="w-full p-4 bg-rose-500 text-white rounded-xl">Unlock</button></div>
       ) : (
         <div className="space-y-6" onMouseMove={handleMouseMove} onTouchMove={handleMouseMove} onMouseUp={() => { setIsDraggingSig(false); setIsResizing(false); }} onTouchEnd={() => { setIsDraggingSig(false); setIsResizing(false); }}>
           {!downloadUrl ? (
             <>
-              <div className="bg-white dark:bg-zinc-900 p-4 rounded-3xl border border-gray-100 dark:border-white/5 relative aspect-[1/1.4] overflow-hidden touch-none" ref={previewRef} onClick={(e) => { if (!signatureImg || isDraggingSig || isResizing) return; const r = e.currentTarget.getBoundingClientRect(); setPos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 }) }}>
+              <div className="bg-pk-surface dark:bg-zinc-900 p-4 rounded-3xl border border-pk-border dark:border-white/5 relative aspect-[1/1.4] overflow-hidden touch-none" ref={previewRef} onClick={(e) => { if (!signatureImg || isDraggingSig || isResizing) return; const r = e.currentTarget.getBoundingClientRect(); setPos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 }) }}>
                 {thumbnail ? <img src={thumbnail} className="w-full h-full object-contain" /> : <div className="w-full h-full flex items-center justify-center"><Loader2 className="animate-spin text-rose-500" /></div>}
                 {signatureImg && (
                   <div onMouseDown={(e) => { e.stopPropagation(); setIsDraggingSig(true) }} onTouchStart={(e) => { e.stopPropagation(); setIsDraggingSig(true) }} style={{ left: `${pos.x}%`, top: `${pos.y}%`, width: `${size}px`, transform: 'translate(-50%, -50%)' }} className="absolute cursor-move ring-2 ring-rose-500 rounded-sm">
@@ -105,17 +105,17 @@ export default function SignatureTool() {
                 )}
               </div>
               <div className="flex gap-4">
-                <button onClick={() => signatureInputRef.current?.click()} className="flex-1 p-4 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white border border-gray-100 dark:border-white/5 rounded-2xl font-black uppercase text-xs hover:border-rose-500 transition-all">
+                <button onClick={() => signatureInputRef.current?.click()} className="flex-1 p-4 bg-gray-50 dark:bg-zinc-800 text-gray-900 dark:text-white border border-pk-border dark:border-white/5 rounded-2xl font-black uppercase text-xs hover:border-rose-500 transition-all">
                   <span className="flex items-center justify-center gap-2"><ImageIcon size={16}/> Upload Signature</span>
                 </button>
               </div>
-              <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm">
                 <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 px-1">Output Filename</label>
                 <input 
                   type="text" 
                   value={customFileName} 
                   onChange={(e) => setCustomFileName(e.target.value)} 
-                  className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" 
+                  className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" 
                 />
               </div>
             </>

@@ -107,19 +107,28 @@ const applyThemeToDom = (resolved: 'light' | 'dark') => {
     root.classList.remove('dark')
     root.style.colorScheme = 'light'
   }
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'dark' ? '#000000' : '#FAFAFA')
+  const themeColor = getComputedStyle(document.documentElement).getPropertyValue('--pk-theme-color').trim()
+    || (resolved === 'dark' ? '#09090B' : '#F3F2EE')
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor)
   // Keep the Android system status bar in sync with the in-app theme
   if (Capacitor.isNativePlatform()) {
     StatusBar.setStyle({ style: resolved === 'dark' ? Style.Dark : Style.Light }).catch(() => {})
-    StatusBar.setBackgroundColor({ color: resolved === 'dark' ? '#000000' : '#FAFAFA' }).catch(() => {})
+    StatusBar.setBackgroundColor({ color: themeColor }).catch(() => {})
   }
 }
 
-// Briefly puts every element under one shared transition so nothing snaps
-const fadeThemeSwitch = () => {
-  const root = document.documentElement
-  root.classList.add('theme-switching')
-  window.setTimeout(() => root.classList.remove('theme-switching'), 650)
+const runThemeTransition = (apply: () => void) => {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const doc = document as Document & {
+    startViewTransition?: (cb: () => void) => { finished: Promise<void> }
+  }
+
+  if (reducedMotion || !doc.startViewTransition) {
+    apply()
+    return
+  }
+
+  doc.startViewTransition(apply)
 }
 
 function QuickDropModal({ file, onClear, onBack }: { file: File, onClear: () => void, onBack?: () => void }) {
@@ -151,7 +160,7 @@ function QuickDropModal({ file, onClear, onBack }: { file: File, onClear: () => 
 
   return (
     <div className="fixed inset-0 z-[600] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="w-full max-w-md bg-[#FAFAFA] dark:bg-zinc-950 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden border-t border-x border-white/10 sm:border animate-in slide-in-from-bottom-full duration-500 ease-out">
+      <div className="w-full max-w-md bg-pk-surface dark:bg-zinc-950 rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-pk-lg overflow-hidden border-t border-x border-pk-border dark:border-white/10 sm:border animate-in slide-in-from-bottom-full duration-500 ease-out">
         
         {/* Header */}
         <div className="p-6 pb-2">
@@ -239,47 +248,17 @@ function App() {
     return 'system'
   })
 
-  // Central animated theme switch: circular reveal from the click point when
-  // the View Transitions API is available, a uniform full-page fade otherwise,
-  // and an instant flip for users who prefer reduced motion.
-  const changeTheme = (next: Theme, origin?: { x: number; y: number }) => {
+  const changeTheme = (next: Theme) => {
     hapticSelection()
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const doc = document as Document & {
-      startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> }
-    }
-
-    const apply = () => {
+    runThemeTransition(() => {
       applyThemeToDom(resolveTheme(next))
       flushSync(() => setTheme(next))
-    }
-
-    if (reducedMotion || !doc.startViewTransition) {
-      if (!reducedMotion) fadeThemeSwitch()
-      apply()
-      return
-    }
-
-    const root = document.documentElement
-    if (origin) root.classList.add('vt-circle')
-    const transition = doc.startViewTransition(apply)
-
-    if (origin) {
-      transition.ready.then(() => {
-        const { x, y } = origin
-        const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
-        root.animate(
-          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-          { duration: 550, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', pseudoElement: '::view-transition-new(root)' }
-        )
-      }).catch(() => {})
-      transition.finished.finally(() => root.classList.remove('vt-circle'))
-    }
+    })
   }
 
-  const toggleTheme = (e?: { clientX: number; clientY: number }) => {
+  const toggleTheme = () => {
     const next = resolveTheme(theme) === 'light' ? 'dark' : 'light'
-    changeTheme(next, e && typeof e.clientX === 'number' ? { x: e.clientX, y: e.clientY } : undefined)
+    changeTheme(next)
   }
 
   // Improved Auto-Wipe Logic
@@ -310,9 +289,7 @@ function App() {
     if (theme === 'system') {
       const media = window.matchMedia('(prefers-color-scheme: dark)')
       const listener = () => {
-        // OS-level theme flips get the uniform fade too
-        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) fadeThemeSwitch()
-        applyThemeToDom(resolveTheme('system'))
+        runThemeTransition(() => applyThemeToDom(resolveTheme('system')))
       }
       media.addEventListener('change', listener)
       return () => media.removeEventListener('change', listener)
@@ -359,7 +336,7 @@ function App() {
   }, [])
 
   const LoadingSpinner = () => (
-    <div className="h-full w-full flex items-center justify-center bg-[#FAFAFA] dark:bg-black min-h-[60vh]">
+    <div className="h-full w-full flex items-center justify-center bg-pk-canvas dark:bg-black min-h-[60vh]">
       <div className="w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
     </div>
   )

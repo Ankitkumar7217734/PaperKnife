@@ -52,12 +52,12 @@ function SortableItem({ id, file, onRemove, onRotate, onUnlock }: { id: string, 
   }
 
   return (
-    <div ref={setNodeRef} style={style} className={`flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-2xl border transition-all shadow-sm group touch-none relative ${isDragging ? 'border-rose-300 dark:border-rose-800 shadow-xl scale-[1.02] ring-4 ring-rose-500/10' : 'border-gray-100 dark:border-zinc-800 hover:border-rose-200 dark:hover:border-rose-900/30'}`}>
+    <div ref={setNodeRef} style={style} className={`flex items-center gap-3 p-3 bg-pk-surface dark:bg-zinc-900 rounded-2xl border transition-all shadow-sm group touch-none relative ${isDragging ? 'border-rose-300 dark:border-rose-800 shadow-xl scale-[1.02] ring-4 ring-rose-500/10' : 'border-pk-border dark:border-zinc-800 hover:border-rose-200 dark:hover:border-rose-900/30'}`}>
       <div {...attributes} {...listeners} className="p-2 cursor-grab text-rose-400 hover:text-rose-600 dark:text-rose-500/50 dark:hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors active:scale-90">
         <GripVertical size={20} />
       </div>
       
-      <div className="w-12 h-16 bg-gray-50 dark:bg-zinc-800 rounded-lg overflow-hidden shrink-0 border border-gray-100 dark:border-zinc-800 relative group-hover:shadow-md transition-shadow">
+      <div className="w-12 h-16 bg-gray-50 dark:bg-zinc-800 rounded-lg overflow-hidden shrink-0 border border-pk-border dark:border-zinc-800 relative group-hover:shadow-md transition-shadow">
         {file.isLocked ? (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 dark:bg-black text-rose-500">
             <Lock size={16} />
@@ -90,7 +90,7 @@ function SortableItem({ id, file, onRemove, onRotate, onUnlock }: { id: string, 
               placeholder="Password" 
               value={localPass}
               onChange={(e) => setLocalPass(e.target.value)}
-              className="flex-1 bg-gray-50 dark:bg-black border border-gray-100 dark:border-zinc-800 rounded-lg px-2 py-1 text-[10px] font-bold outline-none focus:border-rose-500 text-gray-900 dark:text-white"
+              className="flex-1 bg-pk-surface-muted dark:bg-zinc-950 border border-pk-border dark:border-zinc-800 rounded-lg px-2 py-1 text-[10px] font-bold outline-none focus:border-rose-500 text-gray-900 dark:text-white"
             />
             <button 
               onClick={handleUnlockClick}
@@ -401,7 +401,7 @@ export default function MergeTool() {
         {hasRestorableWorkspace && (
           <div className="mb-8 p-6 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30 rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-4 animate-in slide-in-from-top duration-500 shadow-sm">
              <div className="flex items-center gap-4 text-left">
-                <div className="w-12 h-12 bg-white dark:bg-zinc-900 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm">
+                <div className="w-12 h-12 bg-pk-surface dark:bg-zinc-900 rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm">
                    <RefreshCw size={24} className="animate-spin-slow" />
                 </div>
                 <div>
@@ -454,13 +454,13 @@ export default function MergeTool() {
               </button>
 
               {!objectUrl && (
-                <div className="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
+                <div className="p-6 bg-pk-surface dark:bg-zinc-900 rounded-3xl border border-pk-border dark:border-white/5 shadow-sm">
                    <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Output Filename</label>
                    <input 
                       type="text" 
                       value={customFileName}
                       onChange={(e) => setCustomFileName(e.target.value)}
-                      className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 outline-none font-bold text-sm border border-transparent focus:border-rose-500 transition-colors dark:text-white"
+                      className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 outline-none font-bold text-sm border border-transparent focus:border-rose-500 transition-colors dark:text-white"
                    />
                 </div>
               )}
@@ -468,7 +468,7 @@ export default function MergeTool() {
           ) : (
             <button 
               onClick={() => !isProcessing && fileInputRef.current?.click()}
-              className="w-full border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
+              className="w-full border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
             >
                <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-inner">
                   <Upload size={32} />

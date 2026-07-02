@@ -56,7 +56,7 @@ const SpecItem = ({ title, icon: Icon, children, defaultOpen = false }: { title:
 const AboutWeb = () => {
   const navigate = useNavigate()
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black text-gray-900 dark:text-zinc-100 selection:bg-rose-500 selection:text-white pb-24">
+    <div className="min-h-screen pk-shell selection:bg-rose-500 selection:text-white pb-24">
       
       {/* 1. Impact Hero - Compact */}
       <section className="relative pt-20 pb-12 px-6 overflow-hidden">
@@ -183,7 +183,7 @@ const AboutAPK = () => {
             <PaperKnifeLogo size={40} iconColor="#F43F5E" partColor="currentColor" />
           </div>
           <h2 className="text-2xl font-black tracking-tighter dark:text-white leading-none mb-1">PaperKnife</h2>
-          <p className="text-[9px] font-black uppercase tracking-widest text-rose-500">v1.2.0 Stable • Absolute Privacy</p>
+          <p className="text-[9px] font-black uppercase tracking-widest text-rose-500">v1.3.0 Stable • Absolute Privacy</p>
         </div>
 
         {/* 2. Fuel the Engine (Prominent Support - MOVED TO TOP) */}

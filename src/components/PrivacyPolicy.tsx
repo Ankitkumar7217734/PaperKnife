@@ -12,7 +12,7 @@ import { PaperKnifeLogo } from './Logo'
 // --- WEB VERSION (TITAN HIGH-DENSITY) ---
 const PrivacyWeb = () => {
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-black text-gray-900 dark:text-zinc-100 selection:bg-rose-500 selection:text-white p-6 md:p-12 pb-24">
+    <div className="min-h-screen pk-shell selection:bg-rose-500 selection:text-white p-6 md:p-12 pb-24">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Hero Section */}
@@ -101,7 +101,7 @@ const PrivacyWeb = () => {
 
         <div className="pt-12 text-center opacity-30">
            <PaperKnifeLogo size={32} iconColor="#10B981" partColor="currentColor" className="mx-auto mb-4" />
-           <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-400">Privacy Protocol v1.2.0 Stable</p>
+           <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-400">Privacy Protocol v1.3.0 Stable</p>
         </div>
       </div>
     </div>

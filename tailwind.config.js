@@ -7,6 +7,22 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        pk: {
+          canvas: 'var(--pk-canvas)',
+          surface: 'var(--pk-surface)',
+          'surface-muted': 'var(--pk-surface-muted)',
+          border: 'var(--pk-border)',
+          'border-subtle': 'var(--pk-border-subtle)',
+          text: 'var(--pk-text)',
+          'text-muted': 'var(--pk-text-muted)',
+        },
+      },
+      boxShadow: {
+        'pk-sm': 'var(--pk-shadow-sm)',
+        'pk-md': 'var(--pk-shadow-md)',
+        'pk-lg': 'var(--pk-shadow-lg)',
+      },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
       },

@@ -17,7 +17,7 @@ export default function ToolHeader({ title, highlight, description }: ToolHeader
       {isNative && (
         <button 
           onClick={() => navigate('/')}
-          className="absolute left-0 top-0 p-3 bg-gray-50 dark:bg-zinc-900 rounded-2xl text-gray-500 hover:text-rose-500 transition-colors md:hidden"
+          className="absolute left-0 top-0 p-3 bg-pk-surface-muted dark:bg-zinc-900 rounded-2xl text-stone-500 hover:text-rose-500 transition-colors md:hidden"
         >
           <ArrowLeft size={20} />
         </button>

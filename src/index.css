@@ -30,55 +30,136 @@
   font-style: normal;
 }
 
+/* ── Theme tokens ───────────────────────────────────────────── */
 :root {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  --pk-canvas: #F3F2EE;
+  --pk-surface: #FFFFFF;
+  --pk-surface-muted: #FAFAF8;
+  --pk-border: #E4E2DC;
+  --pk-border-subtle: #ECEAE4;
+  --pk-text: #1C1917;
+  --pk-text-muted: #78716C;
+  --pk-header: rgba(255, 255, 255, 0.88);
+  --pk-footer: #FAFAF8;
+  --pk-shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04), 0 2px 8px rgba(28, 25, 23, 0.03);
+  --pk-shadow-md: 0 4px 16px rgba(28, 25, 23, 0.06), 0 1px 3px rgba(28, 25, 23, 0.04);
+  --pk-shadow-lg: 0 12px 40px rgba(28, 25, 23, 0.08);
+  --pk-glow: rgba(244, 63, 94, 0.07);
+  --pk-theme-color: #F3F2EE;
+}
+
+.dark {
+  --pk-canvas: #09090B;
+  --pk-surface: #18181B;
+  --pk-surface-muted: #111113;
+  --pk-border: rgba(255, 255, 255, 0.08);
+  --pk-border-subtle: rgba(255, 255, 255, 0.05);
+  --pk-text: #FAFAFA;
+  --pk-text-muted: #A1A1AA;
+  --pk-header: rgba(9, 9, 11, 0.88);
+  --pk-footer: #000000;
+  --pk-shadow-sm: none;
+  --pk-shadow-md: none;
+  --pk-shadow-lg: none;
+  --pk-glow: rgba(244, 63, 94, 0.1);
+  --pk-theme-color: #09090B;
+}
+
+html {
+  color-scheme: light;
+  background-color: var(--pk-canvas);
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 html, body {
-  @apply bg-[#FAFAFA] dark:bg-black;
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
+  background-color: var(--pk-canvas);
 }
 
 body {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  @apply text-gray-900 dark:text-zinc-100 bg-[#FAFAFA] dark:bg-black transition-colors duration-500 ease-in-out;
+  color: var(--pk-text);
+  background-color: var(--pk-canvas);
   overflow-x: hidden;
 }
 
-/*
- * Theme switching — fallback fade.
- * Applied to <html> only while the theme is changing, so hover/press
- * interactions stay snappy the rest of the time. Covers every element
- * (including headings, links, and SVG icons) so nothing snaps while
- * containers fade.
- */
-html.theme-switching,
-html.theme-switching *,
-html.theme-switching *::before,
-html.theme-switching *::after {
-  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out, border-color 0.5s ease-in-out, fill 0.5s ease-in-out, stroke 0.5s ease-in-out, box-shadow 0.5s ease-in-out !important;
+/* ── Theme transition (View Transitions API) ─────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.38s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/*
- * Theme switching — circular reveal (View Transitions API).
- * The default crossfade is disabled only while .vt-circle is set;
- * the expanding clip-path circle is driven from App.tsx.
- */
-html.vt-circle::view-transition-old(root),
-html.vt-circle::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+::view-transition-old(root) {
+  animation-name: pk-theme-out;
+  z-index: 1;
 }
-html.vt-circle::view-transition-old(root) { z-index: 1; }
-html.vt-circle::view-transition-new(root) { z-index: 9999; }
+
+::view-transition-new(root) {
+  animation-name: pk-theme-in;
+  z-index: 2;
+}
+
+@keyframes pk-theme-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes pk-theme-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none !important;
+  }
+}
+
+@layer components {
+  .pk-shell {
+    background-color: var(--pk-canvas);
+    color: var(--pk-text);
+  }
+
+  .pk-header-bar {
+    background-color: var(--pk-header);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--pk-border);
+  }
+
+  .pk-bottom-bar {
+    background-color: var(--pk-header);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid var(--pk-border);
+  }
+
+  .pk-surface-card {
+    background-color: var(--pk-surface);
+    border: 1px solid var(--pk-border);
+    box-shadow: var(--pk-shadow-sm);
+  }
+
+  .pk-input-field {
+    background-color: var(--pk-surface-muted);
+    border: 1px solid var(--pk-border-subtle);
+    color: var(--pk-text);
+  }
+
+  .pk-muted-panel {
+    background-color: var(--pk-surface-muted);
+    border: 1px solid var(--pk-border);
   }
 }
 
@@ -104,9 +185,10 @@ html.vt-circle::view-transition-new(root) { z-index: 9999; }
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-200 dark:bg-zinc-800 rounded-full;
+  background-color: var(--pk-border);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-300 dark:bg-zinc-700;
+  @apply bg-stone-400 dark:bg-zinc-600;
 }

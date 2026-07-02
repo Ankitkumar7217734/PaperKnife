@@ -28,18 +28,18 @@ export const NativeToolLayout = ({
   const showNativeHeader = Capacitor.isNativePlatform() || viewMode === 'android'
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAFAFA] dark:bg-black transition-colors">
+    <div className="flex flex-col min-h-screen pk-shell">
       {/* Ultra-Compact Native AppBar - Only shown in Android/Native mode on mobile */}
       {showNativeHeader && (
-        <header className="px-4 pt-safe pb-1 flex items-center justify-between sticky top-0 z-30 bg-[#FAFAFA]/95 dark:bg-black/95 backdrop-blur-xl md:hidden border-b border-gray-100 dark:border-white/10">
+        <header className="px-4 pt-safe pb-1 flex items-center justify-between sticky top-0 z-30 pk-header-bar md:hidden">
           <div className="flex items-center gap-2 h-14">
             <button 
               onClick={onBack || (() => navigate(-1))}
-              className="w-10 h-10 flex items-center justify-center rounded-full active:bg-zinc-100 dark:active:bg-zinc-900 transition-colors -ml-1"
+              className="w-10 h-10 flex items-center justify-center rounded-full active:bg-stone-100 dark:active:bg-zinc-900 transition-colors -ml-1"
             >
-              <ArrowLeft size={24} className="text-gray-900 dark:text-white" />
+              <ArrowLeft size={24} className="text-stone-900 dark:text-white" />
             </button>
-            <h1 className="text-lg font-black tracking-tight text-gray-900 dark:text-white ml-1">{title}</h1>
+            <h1 className="text-lg font-black tracking-tight text-stone-900 dark:text-white ml-1">{title}</h1>
           </div>
           <div className="w-10" />
         </header>
@@ -60,7 +60,7 @@ export const NativeToolLayout = ({
 
       {/* Grounded Bottom Action Bar */}
       {actions && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-black/95 backdrop-blur-xl border-t border-gray-100 dark:border-white/10 z-40 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div className="fixed bottom-0 left-0 right-0 pk-bottom-bar z-40 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_-8px_32px_rgba(28,25,23,0.06)] dark:shadow-[0_-8px_32px_rgba(0,0,0,0.35)]">
            <div className="p-4 max-w-md mx-auto">
              {actions}
            </div>

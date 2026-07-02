@@ -253,7 +253,7 @@ export default function CompressImageTool() {
       {!sourceFile ? (
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="w-full border-4 border-dashed border-gray-100 dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
+          className="w-full border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group"
         >
           <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
             <ImageDown size={32} />
@@ -263,8 +263,8 @@ export default function CompressImageTool() {
         </button>
       ) : (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-gray-100 dark:border-white/5 flex items-center gap-6 shadow-sm">
-            <div className="w-12 h-12 bg-gray-50 dark:bg-black rounded-xl overflow-hidden shrink-0 border border-gray-100 dark:border-zinc-800 flex items-center justify-center text-rose-500 shadow-inner">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-3xl border border-pk-border dark:border-white/5 flex items-center gap-6 shadow-sm">
+            <div className="w-12 h-12 bg-pk-surface-muted dark:bg-zinc-950 rounded-xl overflow-hidden shrink-0 border border-pk-border dark:border-zinc-800 flex items-center justify-center text-rose-500 shadow-inner">
               {sourcePreview ? (
                 <img src={sourcePreview} className="w-full h-full object-cover" />
               ) : (
@@ -284,14 +284,14 @@ export default function CompressImageTool() {
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 animate-in fade-in duration-500 items-start">
             <div className="lg:col-span-3 space-y-6">
-              <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm">
+              <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm">
                 <div className="flex items-center justify-between mb-4 px-2">
                   <h4 className="font-black uppercase tracking-widest text-[10px] text-gray-400">Live Preview</h4>
                   <span className="text-[10px] text-gray-400 font-bold uppercase">
                     {width} × {height} • {outExt.toUpperCase()}
                   </span>
                 </div>
-                <div className="bg-gray-50 dark:bg-black rounded-2xl p-6 flex items-center justify-center min-h-[260px] relative">
+                <div className="bg-pk-surface-muted dark:bg-zinc-950 rounded-2xl p-6 flex items-center justify-center min-h-[260px] relative">
                   {outPreview ? (
                     <img
                       src={outPreview}
@@ -309,15 +309,15 @@ export default function CompressImageTool() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 mt-5">
-                  <div className="bg-gray-50 dark:bg-black rounded-xl p-4">
+                  <div className="bg-pk-surface-muted dark:bg-zinc-950 rounded-xl p-4">
                     <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Original</p>
                     <p className="text-sm font-black dark:text-white">{humanSize(sourceSize)}</p>
                   </div>
-                  <div className="bg-gray-50 dark:bg-black rounded-xl p-4">
+                  <div className="bg-pk-surface-muted dark:bg-zinc-950 rounded-xl p-4">
                     <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">New</p>
                     <p className="text-sm font-black dark:text-white">{outSize > 0 ? humanSize(outSize) : '—'}</p>
                   </div>
-                  <div className="bg-gray-50 dark:bg-black rounded-xl p-4">
+                  <div className="bg-pk-surface-muted dark:bg-zinc-950 rounded-xl p-4">
                     <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-1">Savings</p>
                     <p className={`text-sm font-black ${savingsColor}`}>{outSize > 0 ? `${savings}%` : '—'}</p>
                   </div>
@@ -326,14 +326,14 @@ export default function CompressImageTool() {
             </div>
 
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-gray-100 dark:border-white/5 shadow-sm lg:sticky lg:top-24">
+              <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-[2rem] border border-pk-border dark:border-white/5 shadow-sm lg:sticky lg:top-24">
                 <div className="space-y-5">
                   <div>
                     <div className="flex items-center justify-between mb-3 px-1">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400">Dimensions</label>
                       <button
                         onClick={() => setKeepAspect((v) => !v)}
-                        className={`flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-colors ${keepAspect ? 'text-rose-500 bg-rose-50 dark:bg-rose-900/20' : 'text-gray-400 bg-gray-50 dark:bg-black'}`}
+                        className={`flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg transition-colors ${keepAspect ? 'text-rose-500 bg-rose-50 dark:bg-rose-900/20' : 'text-gray-400 bg-pk-surface-muted dark:bg-zinc-950'}`}
                         title={keepAspect ? 'Aspect ratio locked' : 'Aspect ratio unlocked'}
                       >
                         {keepAspect ? <Link2 size={11} /> : <Unlink2 size={11} />} Lock
@@ -345,7 +345,7 @@ export default function CompressImageTool() {
                         min={1}
                         value={width}
                         onChange={(e) => onWidthChange(e.target.value)}
-                        className="w-full bg-gray-50 dark:bg-black rounded-xl px-3 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white text-center"
+                        className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-3 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white text-center"
                       />
                       <span className="text-[10px] font-black text-gray-400">×</span>
                       <input
@@ -353,7 +353,7 @@ export default function CompressImageTool() {
                         min={1}
                         value={height}
                         onChange={(e) => onHeightChange(e.target.value)}
-                        className="w-full bg-gray-50 dark:bg-black rounded-xl px-3 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white text-center"
+                        className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-3 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white text-center"
                       />
                     </div>
                     <button
@@ -371,7 +371,7 @@ export default function CompressImageTool() {
                         <button
                           key={p.label}
                           onClick={() => applyPreset(p.w, p.h)}
-                          className="text-[10px] font-black uppercase tracking-tight bg-gray-50 dark:bg-black hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-500 text-gray-500 py-2 px-2 rounded-xl transition-colors"
+                          className="text-[10px] font-black uppercase tracking-tight bg-pk-surface-muted dark:bg-zinc-950 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-500 text-gray-500 py-2 px-2 rounded-xl transition-colors"
                         >
                           {p.label}
                         </button>
@@ -396,7 +396,7 @@ export default function CompressImageTool() {
 
                   <div>
                     <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 px-1">Output Format</label>
-                    <div className="grid grid-cols-4 gap-1 bg-gray-50 dark:bg-black p-1 rounded-xl">
+                    <div className="grid grid-cols-4 gap-1 bg-pk-surface-muted dark:bg-zinc-950 p-1 rounded-xl">
                       {(['auto', 'jpeg', 'png', 'webp'] as Format[]).map((f) => (
                         <button
                           key={f}
@@ -415,12 +415,12 @@ export default function CompressImageTool() {
                       type="text"
                       value={customFileName}
                       onChange={(e) => setCustomFileName(e.target.value)}
-                      className="w-full bg-gray-50 dark:bg-black rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white"
+                      className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white"
                     />
                   </div>
 
                   {objectUrl && (
-                    <div className="pt-5 border-t border-gray-100 dark:border-white/5">
+                    <div className="pt-5 border-t border-pk-border dark:border-white/5">
                       <SuccessState
                         message="Image Compressed!"
                         downloadUrl={objectUrl}
