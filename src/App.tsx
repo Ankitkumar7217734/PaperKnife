@@ -12,7 +12,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { flushSync } from 'react-dom'
 import { 
   Layers, Scissors, Zap, Smartphone as SmartphoneIcon, Monitor as MonitorIcon, Lock, Unlock, 
-  RotateCw, Type, Hash, Tags, FileText, ArrowUpDown, PenTool, 
+  RotateCw, Type, Hash, Tags, FileText, FileCode, ArrowUpDown, PenTool, 
   Wrench, ImagePlus, FileImage, Palette, X, ChevronDown, LayoutGrid, ImageDown, Expand, ImageUp
 } from 'lucide-react'
 import { HashRouter, Routes, Route, useNavigate } from 'react-router-dom'
@@ -48,6 +48,7 @@ import UnlockTool from './components/tools/UnlockTool'
 import PdfToImageTool from './components/tools/PdfToImageTool'
 import RotateTool from './components/tools/RotateTool'
 import PdfToTextTool from './components/tools/PdfToTextTool'
+import PdfToMarkdownTool from './components/tools/PdfToMarkdownTool'
 import RearrangeTool from './components/tools/RearrangeTool'
 import WatermarkTool from './components/tools/WatermarkTool'
 import PageNumberTool from './components/tools/PageNumberTool'
@@ -79,6 +80,7 @@ const tools: Tool[] = [
   { title: 'Image to PDF', desc: 'Convert JPG, PNG, and WebP into a professional PDF.', icon: ImagePlus, implemented: true, path: '/image-to-pdf', category: 'Convert', color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20' },
   { title: 'Extract Images', desc: 'Pull out all original images embedded in a PDF.', icon: FileImage, implemented: true, path: '/extract-images', category: 'Convert', color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
   { title: 'PDF to Text', desc: 'Extract plain text from your PDF documents.', icon: FileText, implemented: true, path: '/pdf-to-text', category: 'Convert', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/20' },
+  { title: 'PDF to Markdown', desc: 'Convert PDFs to Markdown with headings, emphasis, and layout preserved.', icon: FileCode, implemented: true, path: '/pdf-to-markdown', category: 'Convert', color: 'text-indigo-600', bg: 'bg-indigo-100 dark:bg-indigo-900/20', isNew: true },
   { title: 'Repair PDF', desc: 'Attempt to fix corrupted or unreadable documents.', icon: Wrench, implemented: true, path: '/repair', category: 'Optimize', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
   { title: 'N-Up Pages', desc: 'Place 2, 4, or 6 pages onto one sheet for printing.', icon: LayoutGrid, implemented: true, path: '/nup', category: 'Edit', color: 'text-fuchsia-500', bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/20' },
   { title: 'Compress Image', desc: 'Shrink image size and resize to required dimensions.', icon: ImageDown, implemented: true, path: '/compress-image', category: 'Optimize', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
@@ -430,6 +432,7 @@ function App() {
                 <Route path="/pdf-to-image" element={<PdfToImageTool />} />
                 <Route path="/rotate-pdf" element={<RotateTool />} />
                 {!IS_OCR_DISABLED && <Route path="/pdf-to-text" element={<PdfToTextTool />} />}
+                <Route path="/pdf-to-markdown" element={<PdfToMarkdownTool />} />
                 <Route path="/rearrange-pdf" element={<RearrangeTool />} />
                 <Route path="/watermark" element={<WatermarkTool />} />
                 <Route path="/page-numbers" element={<PageNumberTool />} />

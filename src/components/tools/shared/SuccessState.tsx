@@ -16,6 +16,8 @@ function mimeFromName(name: string): string {
     case 'webp': return 'image/webp'
     case 'gif': return 'image/gif'
     case 'txt': return 'text/plain'
+    case 'md':
+    case 'markdown': return 'text/markdown'
     default: return 'application/pdf'
   }
 }
