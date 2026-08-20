@@ -13,9 +13,9 @@
 
 ## Download Android APK
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v1.3.0-brightgreen?style=for-the-badge&logo=android)](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.3.0/paperknife-debug-v1.3.0.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v1.4.0-brightgreen?style=for-the-badge&logo=android)](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.4.0/paperknife-debug-v1.4.0.apk)
 
-> **Direct link:** https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.3.0/paperknife-debug-v1.3.0.apk
+> **Direct link:** https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.4.0/paperknife-debug-v1.4.0.apk
 >
 > Or browse all versions on the [Releases page](https://github.com/Ankitkumar7217734/PaperKnife/releases).
 
@@ -23,7 +23,8 @@
 
 | Version | APK | Published | Highlights |
 |---------|-----|-----------|------------|
-| **v1.3.0** (latest) | [paperknife-debug-v1.3.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.3.0/paperknife-debug-v1.3.0.apk) | Jul 2026 | PDF to Markdown tool, improved light/dark theme across web and Android |
+| **v1.4.0** (latest) | [paperknife-debug-v1.4.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.4.0/paperknife-debug-v1.4.0.apk) | Aug 2026 | Merge PDF page selection: review merged pages and export only the ones you want |
+| v1.3.0 | [paperknife-debug-v1.3.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.3.0/paperknife-debug-v1.3.0.apk) | Jul 2026 | PDF to Markdown tool, improved light/dark theme across web and Android |
 | v1.1.0 | [paperknife-debug-v1.1.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.1.0/paperknife-debug-v1.1.0.apk) | Jun 2026 | Increase PDF Size, Increase Image Size tools |
 | v1.0.9 | [paperknife-debug-v1.0.9.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.0.9/paperknife-debug-v1.0.9.apk) | May 2026 | Earlier stable release |
 
@@ -49,7 +50,7 @@ PaperKnife solves this. Every tool runs entirely in your browser or on your phon
 **22 tools, all running locally on your device:**
 
 ### ✏️ Edit
-*   **Merge PDF** — combine multiple PDF files into one document.
+*   **Merge PDF** — combine multiple PDF files into one document, then choose which pages to export.
 *   **Split PDF** — visually extract specific pages or ranges.
 *   **Rotate PDF** — fix page orientation permanently.
 *   **Rearrange PDF** — drag and drop pages to reorder them.
