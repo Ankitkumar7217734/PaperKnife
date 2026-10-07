@@ -13,9 +13,9 @@
 
 ## Download Android APK
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v1.4.0-brightgreen?style=for-the-badge&logo=android)](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.4.0/paperknife-debug-v1.4.0.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v1.5.0-brightgreen?style=for-the-badge&logo=android)](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.5.0/paperknife-debug-v1.5.0.apk)
 
-> **Direct link:** https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.4.0/paperknife-debug-v1.4.0.apk
+> **Direct link:** https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.5.0/paperknife-debug-v1.5.0.apk
 >
 > Or browse all versions on the [Releases page](https://github.com/Ankitkumar7217734/PaperKnife/releases).
 
@@ -23,7 +23,8 @@
 
 | Version | APK | Published | Highlights |
 |---------|-----|-----------|------------|
-| **v1.4.0** (latest) | [paperknife-debug-v1.4.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.4.0/paperknife-debug-v1.4.0.apk) | Aug 2026 | Merge PDF page selection: review merged pages and export only the ones you want |
+| **v1.5.0** (latest) | [paperknife-debug-v1.5.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.5.0/paperknife-debug-v1.5.0.apk) | Oct 2026 | New Remove Links tool: strip hidden web links so tapping a page never opens a browser |
+| **v1.4.0** | [paperknife-debug-v1.4.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.4.0/paperknife-debug-v1.4.0.apk) | Aug 2026 | Merge PDF page selection: review merged pages and export only the ones you want |
 | v1.3.0 | [paperknife-debug-v1.3.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.3.0/paperknife-debug-v1.3.0.apk) | Jul 2026 | PDF to Markdown tool, improved light/dark theme across web and Android |
 | v1.1.0 | [paperknife-debug-v1.1.0.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.1.0/paperknife-debug-v1.1.0.apk) | Jun 2026 | Increase PDF Size, Increase Image Size tools |
 | v1.0.9 | [paperknife-debug-v1.0.9.apk](https://github.com/Ankitkumar7217734/PaperKnife/releases/download/v1.0.9/paperknife-debug-v1.0.9.apk) | May 2026 | Earlier stable release |
@@ -47,7 +48,7 @@ PaperKnife solves this. Every tool runs entirely in your browser or on your phon
 
 ## Tools
 
-**22 tools, all running locally on your device:**
+**23 tools, all running locally on your device:**
 
 ### ✏️ Edit
 *   **Merge PDF** — combine multiple PDF files into one document, then choose which pages to export.
@@ -70,6 +71,7 @@ PaperKnife solves this. Every tool runs entirely in your browser or on your phon
 ### 🔒 Secure
 *   **Protect PDF** — encrypt your documents with a password.
 *   **Unlock PDF** — remove passwords from your protected files, locally.
+*   **Remove Links** — strip hidden web links and tracking URLs so tapping the page never opens a browser.
 *   **Metadata** — view and clean document properties (Author, Producer, etc.) to keep your files anonymous.
 
 ### 🔄 Convert
