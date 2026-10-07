@@ -8,7 +8,7 @@
  * (at your option) any later version.
  */
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, type ComponentType } from 'react'
 import { flushSync } from 'react-dom'
 import { 
   Layers, Scissors, Zap, Smartphone as SmartphoneIcon, Monitor as MonitorIcon, Lock, Unlock, 
@@ -63,35 +63,36 @@ import CompressImageTool from './components/tools/CompressImageTool'
 import IncreasePdfTool from './components/tools/IncreasePdfTool'
 import IncreaseImageTool from './components/tools/IncreaseImageTool'
 
-const tools: Tool[] = [
-  { title: 'Merge PDF', desc: 'Combine PDFs, then choose which pages to export.', icon: Layers, implemented: true, path: '/merge', category: 'Edit', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-900/20', isNew: true },
-  { title: 'Split PDF', desc: 'Visually extract specific pages or ranges.', icon: Scissors, implemented: true, path: '/split', category: 'Edit', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-  { title: 'Compress PDF', desc: 'Optimize your file size for easier sharing.', icon: Zap, implemented: true, path: '/compress', category: 'Optimize', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
-  { title: 'Protect PDF', desc: 'Secure your documents with strong encryption.', icon: Lock, implemented: true, path: '/protect', category: 'Secure', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
-  { title: 'Unlock PDF', desc: 'Remove passwords from your protected files.', icon: Unlock, implemented: true, path: '/unlock', category: 'Secure', color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-900/20' },
-  { title: 'Rotate PDF', desc: 'Fix page orientation permanently.', icon: RotateCw, implemented: true, path: '/rotate-pdf', category: 'Edit', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-  { title: 'Rearrange PDF', desc: 'Drag and drop pages to reorder them.', icon: ArrowUpDown, implemented: true, path: '/rearrange-pdf', category: 'Edit', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-  { title: 'Page Numbers', desc: 'Add numbering to your documents automatically.', icon: Hash, implemented: true, path: '/page-numbers', category: 'Edit', color: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-900/20' },
-  { title: 'Watermark', desc: 'Overlay custom text for branding or security.', icon: Type, implemented: true, path: '/watermark', category: 'Edit', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-  { title: 'Metadata', desc: 'Edit document properties for better privacy.', icon: Tags, implemented: true, path: '/metadata', category: 'Secure', color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
-  { title: 'Signature', desc: 'Add your electronic signature to any document.', icon: PenTool, implemented: true, path: '/signature', category: 'Edit', color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-900/20' },
-  { title: 'Grayscale', desc: 'Convert all document pages to black and white.', icon: Palette, implemented: true, path: '/grayscale', category: 'Optimize', color: 'text-zinc-500', bg: 'bg-zinc-50 dark:bg-zinc-900/20' },
-  { title: 'PDF to Image', desc: 'Convert document pages into high-quality images.', icon: FileImage, implemented: true, path: '/pdf-to-image', category: 'Convert', color: 'text-lime-500', bg: 'bg-lime-50 dark:bg-lime-900/20' },
-  { title: 'Image to PDF', desc: 'Convert JPG, PNG, and WebP into a professional PDF.', icon: ImagePlus, implemented: true, path: '/image-to-pdf', category: 'Convert', color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20' },
-  { title: 'Extract Images', desc: 'Pull out all original images embedded in a PDF.', icon: FileImage, implemented: true, path: '/extract-images', category: 'Convert', color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20' },
-  { title: 'PDF to Text', desc: 'Extract plain text from your PDF documents.', icon: FileText, implemented: true, path: '/pdf-to-text', category: 'Convert', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/20' },
-  { title: 'PDF to Markdown', desc: 'Convert PDFs to Markdown with headings, emphasis, and layout preserved.', icon: FileCode, implemented: true, path: '/pdf-to-markdown', category: 'Convert', color: 'text-indigo-600', bg: 'bg-indigo-100 dark:bg-indigo-900/20', isNew: true },
-  { title: 'Repair PDF', desc: 'Attempt to fix corrupted or unreadable documents.', icon: Wrench, implemented: true, path: '/repair', category: 'Optimize', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
-  { title: 'N-Up Pages', desc: 'Place 2, 4, or 6 pages onto one sheet for printing.', icon: LayoutGrid, implemented: true, path: '/nup', category: 'Edit', color: 'text-fuchsia-500', bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/20' },
-  { title: 'Compress Image', desc: 'Shrink image size and resize to required dimensions.', icon: ImageDown, implemented: true, path: '/compress-image', category: 'Optimize', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20' },
-  { title: 'Increase PDF Size', desc: 'Pad a PDF up to an exact target size in KB or MB.', icon: Expand, implemented: true, path: '/increase-pdf', category: 'Optimize', color: 'text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20', isNew: true },
-  { title: 'Increase Image Size', desc: 'Pad an image up to an exact target size in KB or MB.', icon: ImageUp, implemented: true, path: '/increase-image', category: 'Optimize', color: 'text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/20', isNew: true },
+type ToolDefinition = Tool & { component: ComponentType }
+
+const tools: ToolDefinition[] = [
+  { title: 'Merge PDF', desc: 'Combine PDFs, then choose which pages to export.', icon: Layers, implemented: true, path: '/merge', category: 'Edit', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-900/20', isNew: true, component: MergeTool, featuredOrder: 1, shortTitle: 'Merge', shortDesc: 'Combine' },
+  { title: 'Split PDF', desc: 'Visually extract specific pages or ranges.', icon: Scissors, implemented: true, path: '/split', category: 'Edit', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20', component: SplitTool, featuredOrder: 3, shortTitle: 'Split', shortDesc: 'Extract' },
+  { title: 'Compress PDF', desc: 'Optimize your file size for easier sharing.', icon: Zap, implemented: true, path: '/compress', category: 'Optimize', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', component: CompressTool, featuredOrder: 2, shortTitle: 'Compress', shortDesc: 'Optimize' },
+  { title: 'Protect PDF', desc: 'Secure your documents with strong encryption.', icon: Lock, implemented: true, path: '/protect', category: 'Secure', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', component: ProtectTool, featuredOrder: 4, shortTitle: 'Protect', shortDesc: 'Secure' },
+  { title: 'Unlock PDF', desc: 'Remove passwords from your protected files.', icon: Unlock, implemented: true, path: '/unlock', category: 'Secure', color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-900/20', component: UnlockTool },
+  { title: 'Rotate PDF', desc: 'Fix page orientation permanently.', icon: RotateCw, implemented: true, path: '/rotate-pdf', category: 'Edit', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', component: RotateTool },
+  { title: 'Rearrange PDF', desc: 'Drag and drop pages to reorder them.', icon: ArrowUpDown, implemented: true, path: '/rearrange-pdf', category: 'Edit', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', component: RearrangeTool },
+  { title: 'Page Numbers', desc: 'Add numbering to your documents automatically.', icon: Hash, implemented: true, path: '/page-numbers', category: 'Edit', color: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-900/20', component: PageNumberTool },
+  { title: 'Watermark', desc: 'Overlay custom text for branding or security.', icon: Type, implemented: true, path: '/watermark', category: 'Edit', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20', component: WatermarkTool },
+  { title: 'Metadata', desc: 'Edit document properties for better privacy.', icon: Tags, implemented: true, path: '/metadata', category: 'Secure', color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-900/20', component: MetadataTool },
+  { title: 'Signature', desc: 'Add your electronic signature to any document.', icon: PenTool, implemented: true, path: '/signature', category: 'Edit', color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-900/20', component: SignatureTool },
+  { title: 'Grayscale', desc: 'Convert all document pages to black and white.', icon: Palette, implemented: true, path: '/grayscale', category: 'Optimize', color: 'text-zinc-500', bg: 'bg-zinc-50 dark:bg-zinc-900/20', component: GrayscaleTool },
+  { title: 'PDF to Image', desc: 'Convert document pages into high-quality images.', icon: FileImage, implemented: true, path: '/pdf-to-image', category: 'Convert', color: 'text-lime-500', bg: 'bg-lime-50 dark:bg-lime-900/20', component: PdfToImageTool },
+  { title: 'Image to PDF', desc: 'Convert JPG, PNG, and WebP into a professional PDF.', icon: ImagePlus, implemented: true, path: '/image-to-pdf', category: 'Convert', color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20', component: ImageToPdfTool },
+  { title: 'Extract Images', desc: 'Pull out all original images embedded in a PDF.', icon: FileImage, implemented: true, path: '/extract-images', category: 'Convert', color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-900/20', component: ExtractImagesTool },
+  { title: 'PDF to Text', desc: 'Extract plain text from your PDF documents.', icon: FileText, implemented: true, path: '/pdf-to-text', category: 'Convert', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/20', component: PdfToTextTool },
+  { title: 'PDF to Markdown', desc: 'Convert PDFs to Markdown with headings, emphasis, and layout preserved.', icon: FileCode, implemented: true, path: '/pdf-to-markdown', category: 'Convert', color: 'text-indigo-600', bg: 'bg-indigo-100 dark:bg-indigo-900/20', isNew: true, component: PdfToMarkdownTool },
+  { title: 'Repair PDF', desc: 'Attempt to fix corrupted or unreadable documents.', icon: Wrench, implemented: true, path: '/repair', category: 'Optimize', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', component: RepairTool },
+  { title: 'N-Up Pages', desc: 'Place 2, 4, or 6 pages onto one sheet for printing.', icon: LayoutGrid, implemented: true, path: '/nup', category: 'Edit', color: 'text-fuchsia-500', bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/20', component: NUpTool },
+  { title: 'Compress Image', desc: 'Shrink image size and resize to required dimensions.', icon: ImageDown, implemented: true, path: '/compress-image', category: 'Optimize', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20', component: CompressImageTool },
+  { title: 'Increase PDF Size', desc: 'Pad a PDF up to an exact target size in KB or MB.', icon: Expand, implemented: true, path: '/increase-pdf', category: 'Optimize', color: 'text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20', isNew: true, component: IncreasePdfTool },
+  { title: 'Increase Image Size', desc: 'Pad an image up to an exact target size in KB or MB.', icon: ImageUp, implemented: true, path: '/increase-image', category: 'Optimize', color: 'text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/20', isNew: true, component: IncreaseImageTool },
 ]
 
-export const IS_OCR_DISABLED = import.meta.env.VITE_DISABLE_OCR === 'true'
-export const activeTools = IS_OCR_DISABLED
-  ? tools.filter(t => t.path !== '/pdf-to-text')
-  : tools
+// Every build exposes the same tool catalog. Lite/F-Droid builds disable only
+// Deep OCR inside PdfToTextTool; Fast Scan remains fully available.
+export const activeTools = tools
 
 const resolveTheme = (t: Theme): 'light' | 'dark' =>
   t === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : t
@@ -296,30 +297,51 @@ function App() {
     }
   }, [theme])
 
-  // Handle Intent Files (Android "Open With" / "Share to")
+  // Handle Intent Files (Android "Open With" / "Share to"). MainActivity
+  // also stores cold-start intents on window until this listener is mounted.
   useEffect(() => {
-    const handleIntentFile = async (uri: string) => {
+    type FileIntentDetail = { uri: string, name?: string, temporary?: boolean }
+    const intentWindow = window as Window & { __paperknifePendingFileIntent?: FileIntentDetail }
+
+    const handleIntentFile = async ({ uri, name, temporary }: FileIntentDetail) => {
       try {
         toast.loading('Importing file...', { id: 'intent-load' })
-        const fileContent = await Filesystem.readFile({ path: uri })
-        const blob = await (await fetch(`data:application/pdf;base64,${fileContent.data}`)).blob()
-        const fileName = uri.split('/').pop() || 'imported-file.pdf'
-        const file = new File([blob], fileName.endsWith('.pdf') ? fileName : `${fileName}.pdf`, { type: 'application/pdf' })
-        setDroppedFile(file)
+        let blob: Blob
+        try {
+          const response = await fetch(Capacitor.convertFileSrc(uri))
+          if (!response.ok) throw new Error(`Could not read imported PDF (${response.status})`)
+          blob = await response.blob()
+        } catch {
+          const fileContent = await Filesystem.readFile({ path: uri })
+          blob = typeof fileContent.data === 'string'
+            ? await (await fetch(`data:application/pdf;base64,${fileContent.data.includes(',') ? fileContent.data.split(',').pop() : fileContent.data}`)).blob()
+            : fileContent.data
+        }
+        const requestedName = name || uri.split('/').pop() || 'imported-file.pdf'
+        const fileName = requestedName.toLowerCase().endsWith('.pdf') ? requestedName : `${requestedName}.pdf`
+        setDroppedFile(new File([blob], fileName, { type: 'application/pdf' }))
+        setShowQuickDrop(false)
         toast.success('File imported successfully!', { id: 'intent-load' })
       } catch (error) {
         console.error('Intent load error:', error)
         toast.error('Failed to import file.', { id: 'intent-load' })
+      } finally {
+        if (temporary) Filesystem.deleteFile({ path: uri }).catch(() => {})
       }
     }
 
-    const onFileIntent = (e: any) => {
-      if (e.detail?.uri) {
-        handleIntentFile(e.detail.uri)
-      }
+    const consumeIntent = (detail?: FileIntentDetail) => {
+      if (!detail?.uri) return
+      delete intentWindow.__paperknifePendingFileIntent
+      void handleIntentFile(detail)
+    }
+
+    const onFileIntent = (event: Event) => {
+      consumeIntent((event as CustomEvent<FileIntentDetail>).detail)
     }
 
     window.addEventListener('fileIntent', onFileIntent)
+    consumeIntent(intentWindow.__paperknifePendingFileIntent)
     return () => window.removeEventListener('fileIntent', onFileIntent)
   }, [])
 
@@ -343,7 +365,7 @@ function App() {
 
   const handleGlobalDrop = (files: FileList) => {
     const file = files[0]
-    if (!file || file.type !== 'application/pdf') {
+    if (!file || (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf'))) {
       toast.error('Please drop a valid PDF file.')
       return
     }
@@ -396,33 +418,16 @@ function App() {
                   viewMode === 'web' ? (
                     <WebView tools={activeTools} />
                   ) : (
-                    <AndroidView toggleTheme={toggleTheme} theme={theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme} onFileSelect={(file) => handleGlobalDrop([file] as any)} />
+                    <AndroidView tools={activeTools} toggleTheme={toggleTheme} theme={theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme} onFileSelect={(file) => handleGlobalDrop([file] as any)} />
                   )
                 } />
                 <Route path="/android-tools" element={<AndroidToolsView tools={activeTools} />} />
                 <Route path="/android-history" element={<AndroidHistoryView />} />
-                <Route path="/merge" element={<MergeTool />} />
-                <Route path="/split" element={<SplitTool />} />
-                <Route path="/protect" element={<ProtectTool />} />
-                <Route path="/unlock" element={<UnlockTool />} />
-                <Route path="/compress" element={<CompressTool />} />
-                <Route path="/pdf-to-image" element={<PdfToImageTool />} />
-                <Route path="/rotate-pdf" element={<RotateTool />} />
-                {!IS_OCR_DISABLED && <Route path="/pdf-to-text" element={<PdfToTextTool />} />}
-                <Route path="/pdf-to-markdown" element={<PdfToMarkdownTool />} />
-                <Route path="/rearrange-pdf" element={<RearrangeTool />} />
-                <Route path="/watermark" element={<WatermarkTool />} />
-                <Route path="/page-numbers" element={<PageNumberTool />} />
-                <Route path="/metadata" element={<MetadataTool />} />
-                <Route path="/image-to-pdf" element={<ImageToPdfTool />} />
-                <Route path="/signature" element={<SignatureTool />} />
-                <Route path="/repair" element={<RepairTool />} />
-                <Route path="/extract-images" element={<ExtractImagesTool />} />
-                <Route path="/grayscale" element={<GrayscaleTool />} />
-                <Route path="/nup" element={<NUpTool />} />
-                <Route path="/compress-image" element={<CompressImageTool />} />
-                <Route path="/increase-pdf" element={<IncreasePdfTool />} />
-                <Route path="/increase-image" element={<IncreaseImageTool />} />
+                {activeTools
+                  .filter(tool => tool.implemented !== false && tool.path)
+                  .map(({ path, component: ToolComponent }) => (
+                    <Route key={path} path={path} element={<ToolComponent />} />
+                  ))}
                 <Route path="/about" element={<About viewMode={viewMode} />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/settings" element={<SettingsView theme={theme} setTheme={changeTheme} />} />

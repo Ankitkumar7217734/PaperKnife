@@ -25,4 +25,10 @@ export interface Tool {
 
   isNew?: boolean
 
+  featuredOrder?: number
+
+  shortTitle?: string
+
+  shortDesc?: string
+
 }

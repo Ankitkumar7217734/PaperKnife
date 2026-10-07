@@ -104,17 +104,17 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
     }
   }, [onFileDrop])
 
-  const activeTool = tools.find(t => {
-    const pathPart = t.title.split(' ')[0].toLowerCase()
-    return location.pathname.includes(`/${pathPart}`)
-  })
+  const activeTool = tools.find(tool => tool.path === location.pathname)
 
   const isHome = location.pathname === '/'
 
-  const isMainView = isHome || 
-    location.pathname.endsWith('/android-tools') || 
-    location.pathname.endsWith('/android-history') || 
-    location.pathname.endsWith('/settings')
+  const isMainView = isHome ||
+    location.pathname.endsWith('/android-tools') ||
+    location.pathname.endsWith('/android-history') ||
+    location.pathname.endsWith('/settings') ||
+    location.pathname.endsWith('/about') ||
+    location.pathname.endsWith('/privacy') ||
+    location.pathname.endsWith('/thanks')
 
   const shouldShowNav = showMobileNav && isMainView && !activeTool
 
@@ -186,6 +186,10 @@ export default function Layout({ children, theme, toggleTheme, tools, onFileDrop
             <Link to="/about" className={`p-2 md:px-4 md:py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${location.pathname.includes('about') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-500' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'}`}>
               <InfoIcon size={18} />
               <span className="hidden sm:block">About</span>
+            </Link>
+            <Link to="/settings" aria-label="Settings" className={`p-2 md:px-4 md:py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${location.pathname.includes('settings') ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-500' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'}`}>
+              <SettingsIcon size={18} />
+              <span className="hidden lg:block">Settings</span>
             </Link>
             <button onClick={toggleTheme} aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'} className="p-2.5 rounded-xl text-stone-400 hover:text-rose-500 hover:bg-stone-100 dark:hover:bg-zinc-900 transition-colors duration-200">
               {theme === 'light' ? <MoonIcon size={20} /> : <SunIcon size={20} />}

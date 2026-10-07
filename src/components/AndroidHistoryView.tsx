@@ -4,6 +4,7 @@ import {
   Clock as HistoryIcon, Shield as ShieldIcon, Search as SearchIcon, FileText as FileTextIcon, ChevronRight as ChevronRightIcon, X as XIcon, Trash2 as Trash2Icon, Calendar as CalendarIcon, HardDrive as HardDriveIcon
 } from 'lucide-react'
 import { ActivityEntry, getRecentActivity, clearActivity } from '../utils/recentActivity'
+import { downloadFile } from '../utils/pdfHelpers'
 import { toast } from 'sonner'
 
 export default function AndroidHistoryView() {
@@ -33,6 +34,20 @@ export default function AndroidHistoryView() {
         onClick: () => toast.dismiss('history-wipe-confirm')
       }
     })
+  }
+
+  const handleDownload = async (item: ActivityEntry) => {
+    if (!item.resultUrl) return
+    try {
+      toast.loading(`Saving ${item.name}...`, { id: 'history-download' })
+      const response = await fetch(item.resultUrl)
+      const blob = await response.blob()
+      await downloadFile(new Uint8Array(await blob.arrayBuffer()), item.name, blob.type || 'application/octet-stream')
+      toast.success(`Saved ${item.name}`, { id: 'history-download' })
+    } catch (error) {
+      console.error('History download failed:', error)
+      toast.error('This temporary result has expired. Run the tool again to recreate it.', { id: 'history-download' })
+    }
   }
 
   const filteredHistory = history.filter(item => 
@@ -124,13 +139,13 @@ export default function AndroidHistoryView() {
               </div>
               <div className="flex items-center gap-2">
                  {item.resultUrl && (
-                    <a 
-                      href={item.resultUrl} 
-                      download={item.name} 
+                    <button
+                      onClick={() => handleDownload(item)}
+                      aria-label={`Save ${item.name}`}
                       className="w-10 h-10 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-rose-500/20 active:scale-90 transition-all"
                     >
                       <DownloadIcon size={18} />
-                    </a>
+                    </button>
                  )}
                  <ChevronRightIcon size={16} className="text-gray-200 dark:text-zinc-800" />
               </div>

@@ -121,6 +121,7 @@ export default function WebView({ tools }: { tools: Tool[] }) {
 
   const filteredTools = useMemo(() => {
     return tools.filter(tool => {
+      if (tool.implemented === false || !tool.path) return false
       const matchesSearch = tool.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            tool.desc.toLowerCase().includes(searchQuery.toLowerCase())
       const matchesCategory = activeCategory === 'All' || tool.category === activeCategory

@@ -12,27 +12,25 @@ import { useNavigate } from 'react-router-dom'
 import { 
   ChevronRight as ChevronRightIcon,
   FileText as FileTextIcon,
-  Layers as LayersIcon, 
-  Zap as ZapIcon, 
-  Scissors as ScissorsIcon, 
-  Lock as LockIcon,
   Moon as MoonIcon, 
   Sun as SunIcon, 
   Upload as UploadIcon,
   LayoutGrid as LayoutGridIcon, 
   ClipboardList
 } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { getRecentActivity, ActivityEntry } from '../utils/recentActivity'
 import { PaperKnifeLogo } from './Logo'
+import { Tool } from '../types'
 
 interface AndroidViewProps {
+  tools: Tool[]
   theme: 'light' | 'dark'
   toggleTheme: () => void
   onFileSelect?: (file: File) => void
 }
 
-export default function AndroidView({ theme, toggleTheme, onFileSelect }: AndroidViewProps) {
+export default function AndroidView({ tools, theme, toggleTheme, onFileSelect }: AndroidViewProps) {
   const navigate = useNavigate()
   const [history, setHistory] = useState<ActivityEntry[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -41,12 +39,11 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
     getRecentActivity(3).then(setHistory)
   }, [])
 
-  const quickActions = [
-    { title: 'Merge', icon: LayersIcon, path: '/merge', color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-900/20', sub: 'Combine' },
-    { title: 'Compress', icon: ZapIcon, path: '/compress', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', sub: 'Optimize' },
-    { title: 'Split', icon: ScissorsIcon, path: '/split', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20', sub: 'Extract' },
-    { title: 'Protect', icon: LockIcon, path: '/protect', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', sub: 'Secure' },
-  ]
+  const quickActions = useMemo(() => (
+    tools
+      .filter(tool => tool.implemented !== false && tool.featuredOrder !== undefined && tool.path)
+      .sort((left, right) => (left.featuredOrder || 0) - (right.featuredOrder || 0))
+  ), [tools])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -162,15 +159,15 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
              {quickActions.map((action) => (
                 <button
                   key={action.title}
-                  onClick={() => navigate(action.path)}
+                  onClick={() => action.path && navigate(action.path)}
                   className="p-5 pk-surface-card rounded-[2rem] flex flex-col justify-between h-32 active:bg-pk-surface-muted dark:active:bg-zinc-950 transition-colors text-left relative overflow-hidden"
                 >
                   <div className={`w-10 h-10 ${action.bg} ${action.color} rounded-xl flex items-center justify-center mb-2`}>
                     <action.icon size={20} strokeWidth={2.5} />
                   </div>
                   <div className="relative z-10">
-                     <span className="text-sm font-black text-gray-900 dark:text-white block leading-none mb-1">{action.title}</span>
-                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">{action.sub}</span>
+                     <span className="text-sm font-black text-gray-900 dark:text-white block leading-none mb-1">{action.shortTitle || action.title}</span>
+                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tight">{action.shortDesc || action.category}</span>
                   </div>
                 </button>
               ))}
@@ -188,7 +185,7 @@ export default function AndroidView({ theme, toggleTheme, onFileSelect }: Androi
                     </div>
                     <div>
                        <span className="text-sm font-black block leading-none mb-1">More Engines</span>
-                       <span className="text-[9px] font-bold opacity-80 uppercase tracking-widest">Full Catalog</span>
+                       <span className="text-[9px] font-bold opacity-80 uppercase tracking-widest">{tools.filter(tool => tool.implemented !== false).length} Tools • Full Catalog</span>
                     </div>
                  </div>
                  <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center relative z-10">

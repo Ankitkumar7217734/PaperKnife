@@ -25,7 +25,7 @@ Because the codebase targets both shells from one source, **`Capacitor.isNativeP
 
 `src/App.tsx` is the source of truth:
 
-- The `tools` array (and exported `activeTools`, filtered by `IS_OCR_DISABLED`) drives the home grids, the QuickDrop modal, and the Android tools view. Adding a tool means: add to `tools`, add a `<Route>`, and create a component under `src/components/tools/`.
+- The `tools` array and exported `activeTools` drive both home grids, QuickDrop, Android quick actions, the Android tools view, and tool `<Route>` generation. Each entry contains its component, so adding a tool means creating the component and adding exactly one registry entry.
 - Routes are `HashRouter`-based (required for static hosting under a subpath and for Capacitor's `file://` scheme).
 - Tool components are statically imported (not lazy), intentionally — dynamic imports break in the Android APK shell.
 - Not every tool is PDF-in/PDF-out. `CompressImageTool` accepts and emits images (`image/jpeg|png|webp`). When you add a non-PDF tool, set `showPreview={false}` on `SuccessState` (the built-in preview is a `PdfPreview`), and rely on the shared mime-from-filename derivation (see Save/share below).
@@ -46,9 +46,9 @@ To access `viewMode` inside a deeply nested component without prop drilling, use
 
 ### PDF processing
 
-- Heavy work happens in `src/utils/pdfWorker.ts`, a Web Worker that handles `MERGE_PDFS`, `SPLIT_PDF`, and `COMPRESS_PDF_ASSEMBLY`. The worker uses `pdf-lib` only; canvas rasterization (for compress) is done on the main thread before posting `imageBytes` into the worker, because OffscreenCanvas isn't reliable across all targets.
+- Heavy work happens in `src/utils/pdfWorker.ts`, a Web Worker that handles merge, split, and incremental compression assembly. Compression rasterizes one bounded page at a time on the main thread, transfers its JPEG/PNG bytes to the worker, and immediately releases the canvas; OffscreenCanvas isn't reliable across all targets.
 - `pdfjs-dist` is used for rendering/previews; `pdfHelpers.ts` wires its worker via `?url` import and sets `cMapUrl` differently for web vs. Capacitor.
-- `tesseract.js` powers `PdfToTextTool` OCR. Tesseract WASM/traineddata is fetched into `public/tesseract/` at CI build time, not committed. The `IS_OCR_DISABLED` export in `App.tsx` (driven by `VITE_DISABLE_OCR`) gates both the route and the tool card.
+- `tesseract.js` powers `PdfToTextTool` OCR. Matching worker/core assets and traineddata are staged into `public/tesseract/` by web and full-Android CI builds. `VITE_DISABLE_OCR=true` disables only Deep OCR in lite/F-Droid builds; PDF-to-Text Fast Scan and its route remain available, preserving the 22-tool catalog.
 - `vite.config.ts` `manualChunks` splits `pdf-lib`, `pdfjs-dist`, `tesseract.js`, and vendor UI libs into separate chunks — keep new heavy deps out of the main bundle by adding them here.
 
 ### Save / share abstraction
@@ -61,7 +61,7 @@ When creating blob URLs (e.g. for in-page previews), use the `useObjectURL()` ho
 
 ### Android "Open With" / share intents
 
-`src/App.tsx` listens for a `fileIntent` window event (dispatched by the Android shell) and reads the URI via `Filesystem.readFile`. There's also a global `open-quick-drop` window event used as a cross-component trigger to surface the QuickDrop modal. Prefer these events over prop drilling when a deep component needs to hand a file to the root.
+`MainActivity` copies Android `content://` VIEW/SEND inputs into the private cache off the UI thread, JSON-escapes their metadata, and stores a pending `fileIntent` payload on `window` so cold-start events survive until React mounts. `src/App.tsx` consumes the event (using `Capacitor.convertFileSrc` with a Filesystem fallback) and deletes the temporary cache copy. There's also a global `open-quick-drop` event used to surface QuickDrop from deep components.
 
 ### Storage layer
 

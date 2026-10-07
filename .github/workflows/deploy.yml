@@ -23,6 +23,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prepare Offline OCR Assets
+        run: |
+          mkdir -p public/tesseract
+          cp node_modules/tesseract.js/dist/worker.min.js public/tesseract/worker.min.js
+          cp node_modules/tesseract.js-core/tesseract-core.wasm.js public/tesseract/tesseract-core.wasm.js
+          cp node_modules/tesseract.js-core/tesseract-core.wasm public/tesseract/tesseract-core.wasm
+          curl --fail --location --retry 3 -o public/tesseract/eng.traineddata.gz https://raw.githubusercontent.com/naptha/tessdata/gh-pages/4.0.0/eng.traineddata.gz
+          gunzip -f public/tesseract/eng.traineddata.gz
+
       - name: Build
         run: npm run build
         env:

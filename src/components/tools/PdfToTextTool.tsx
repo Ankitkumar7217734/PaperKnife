@@ -12,6 +12,8 @@ import { NativeToolLayout } from './shared/NativeToolLayout'
 type PdfToTextData = { file: File, pageCount: number, isLocked: boolean, pdfDoc?: any, password?: string }
 type ExtractionMode = 'text' | 'ocr'
 
+const TESSERACT_ASSET_BASE = `${import.meta.env.BASE_URL}tesseract/`
+
 export default function PdfToTextTool() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { consumePipelineFile } = usePipeline()
@@ -74,9 +76,9 @@ export default function PdfToTextTool() {
       } else {
         let currentPageIndex = 1
         const worker = await Tesseract.createWorker('eng', 1, { 
-          workerPath: '/tesseract/worker.min.js',
-          corePath: '/tesseract/tesseract-core.wasm.js',
-          langPath: '/tesseract/',
+          workerPath: `${TESSERACT_ASSET_BASE}worker.min.js`,
+          corePath: `${TESSERACT_ASSET_BASE}tesseract-core.wasm.js`,
+          langPath: TESSERACT_ASSET_BASE,
           gzip: false,
           cacheMethod: 'none',
           logger: (m: any) => { 

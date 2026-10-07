@@ -167,11 +167,12 @@ export const shareFile = async (data: Uint8Array | string, fileName: string, mim
 };
 
 // Optimized: Load the PDF Document once
-export const loadPdfDocument = async (file: File) => {
+export const loadPdfDocument = async (file: File, password?: string) => {
   const arrayBuffer = await file.arrayBuffer();
   try {
     const loadingTask = pdfjsLib.getDocument({
       data: arrayBuffer,
+      password: password || undefined,
       cMapUrl: getCMapUrl(),
       cMapPacked: true,
     });
@@ -182,6 +183,7 @@ export const loadPdfDocument = async (file: File) => {
     }
     const loadingTask = pdfjsLib.getDocument({
       data: arrayBuffer,
+      password: password || undefined,
       cMapUrl: getCMapUrl(),
       cMapPacked: true,
       stopAtErrors: false,
@@ -272,6 +274,7 @@ export const generateThumbnail = async (file: File, pageNum: number = 1): Promis
 };
 
 export const getPdfMetaData = async (file: File): Promise<PdfMetaData> => {
+  let pdf: any;
   try {
     const loadingTask = pdfjsLib.getDocument({
       data: await file.arrayBuffer(),
@@ -281,12 +284,13 @@ export const getPdfMetaData = async (file: File): Promise<PdfMetaData> => {
     
     loadingTask.onPassword = () => { throw new Error('PASSWORD_REQUIRED'); };
     
-    const pdf = await loadingTask.promise;
+    pdf = await loadingTask.promise;
+    const pageCount = pdf.numPages;
     const firstPageThumb = await renderPageThumbnail(pdf, 1);
     
     return {
       thumbnail: firstPageThumb,
-      pageCount: pdf.numPages,
+      pageCount,
       isLocked: false
     };
   } catch (error: any) {
@@ -294,6 +298,12 @@ export const getPdfMetaData = async (file: File): Promise<PdfMetaData> => {
       return { thumbnail: '', pageCount: 0, isLocked: true };
     }
     return { thumbnail: '', pageCount: 0, isLocked: false };
+  } finally {
+    try {
+      await pdf?.destroy?.();
+    } catch {
+      // Best-effort cleanup for partially loaded PDF.js documents.
+    }
   }
 };
 

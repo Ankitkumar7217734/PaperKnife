@@ -26,16 +26,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Fetch OCR Binaries (Global Version Only)
+      - name: Prepare Offline OCR Assets (Global Version Only)
         run: |
           mkdir -p public/tesseract
-          curl -Lo public/tesseract/tesseract-core.wasm https://unpkg.com/tesseract.js-core@v5.1.1/tesseract-core.wasm
-          curl -Lo public/tesseract/tesseract-core-simd.wasm https://unpkg.com/tesseract.js-core@v5.1.1/tesseract-core-simd.wasm
-          curl -Lo public/tesseract/tesseract-core-lstm.wasm https://unpkg.com/tesseract.js-core@v5.1.1/tesseract-core-lstm.wasm
-          curl -Lo public/tesseract/tesseract-core.wasm.js https://unpkg.com/tesseract.js-core@v5.1.1/tesseract-core.wasm.js
-          curl -Lo public/tesseract/worker.min.js https://unpkg.com/tesseract.js@v5.1.1/dist/worker.min.js
-          curl -Lo public/tesseract/eng.traineddata.gz https://raw.githubusercontent.com/naptha/tessdata/gh-pages/4.0.0/eng.traineddata.gz
-          gunzip public/tesseract/eng.traineddata.gz
+          cp node_modules/tesseract.js/dist/worker.min.js public/tesseract/worker.min.js
+          cp node_modules/tesseract.js-core/tesseract-core.wasm.js public/tesseract/tesseract-core.wasm.js
+          cp node_modules/tesseract.js-core/tesseract-core.wasm public/tesseract/tesseract-core.wasm
+          curl --fail --location --retry 3 -o public/tesseract/eng.traineddata.gz https://raw.githubusercontent.com/naptha/tessdata/gh-pages/4.0.0/eng.traineddata.gz
+          gunzip -f public/tesseract/eng.traineddata.gz
 
       - name: Build Web Assets (Global)
         run: npm run build
