@@ -10,10 +10,10 @@
 
 import { useState, useEffect, Suspense, type ComponentType } from 'react'
 import { flushSync } from 'react-dom'
-import { 
-  Layers, Scissors, Zap, Smartphone as SmartphoneIcon, Monitor as MonitorIcon, Lock, Unlock, 
-  RotateCw, Type, Hash, Tags, FileText, FileCode, ArrowUpDown, PenTool, 
-  Wrench, ImagePlus, FileImage, Palette, X, ChevronDown, LayoutGrid, ImageDown, Expand, ImageUp
+import {
+  Layers, Scissors, Zap, Smartphone as SmartphoneIcon, Monitor as MonitorIcon, Lock, Unlock,
+  RotateCw, Type, Hash, Tags, FileText, FileCode, ArrowUpDown, PenTool,
+  Wrench, ImagePlus, FileImage, Palette, X, ChevronDown, LayoutGrid, ImageDown, Expand, ImageUp, Link2Off
 } from 'lucide-react'
 import { HashRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { Toaster, toast } from 'sonner'
@@ -45,6 +45,7 @@ import SplitTool from './components/tools/SplitTool'
 import ProtectTool from './components/tools/ProtectTool'
 import CompressTool from './components/tools/CompressTool'
 import UnlockTool from './components/tools/UnlockTool'
+import RemoveLinksTool from './components/tools/RemoveLinksTool'
 import PdfToImageTool from './components/tools/PdfToImageTool'
 import RotateTool from './components/tools/RotateTool'
 import PdfToTextTool from './components/tools/PdfToTextTool'
@@ -71,6 +72,7 @@ const tools: ToolDefinition[] = [
   { title: 'Compress PDF', desc: 'Optimize your file size for easier sharing.', icon: Zap, implemented: true, path: '/compress', category: 'Optimize', color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20', component: CompressTool, featuredOrder: 2, shortTitle: 'Compress', shortDesc: 'Optimize' },
   { title: 'Protect PDF', desc: 'Secure your documents with strong encryption.', icon: Lock, implemented: true, path: '/protect', category: 'Secure', color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', component: ProtectTool, featuredOrder: 4, shortTitle: 'Protect', shortDesc: 'Secure' },
   { title: 'Unlock PDF', desc: 'Remove passwords from your protected files.', icon: Unlock, implemented: true, path: '/unlock', category: 'Secure', color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-900/20', component: UnlockTool },
+  { title: 'Remove Links', desc: 'Strip hidden links so tapping a page never opens a browser.', icon: Link2Off, implemented: true, path: '/remove-links', category: 'Secure', color: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-900/20', isNew: true, component: RemoveLinksTool },
   { title: 'Rotate PDF', desc: 'Fix page orientation permanently.', icon: RotateCw, implemented: true, path: '/rotate-pdf', category: 'Edit', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', component: RotateTool },
   { title: 'Rearrange PDF', desc: 'Drag and drop pages to reorder them.', icon: ArrowUpDown, implemented: true, path: '/rearrange-pdf', category: 'Edit', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', component: RearrangeTool },
   { title: 'Page Numbers', desc: 'Add numbering to your documents automatically.', icon: Hash, implemented: true, path: '/page-numbers', category: 'Edit', color: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-900/20', component: PageNumberTool },

@@ -48,7 +48,7 @@ To access `viewMode` inside a deeply nested component without prop drilling, use
 
 - Heavy work happens in `src/utils/pdfWorker.ts`, a Web Worker that handles merge, split, and incremental compression assembly. Compression rasterizes one bounded page at a time on the main thread, transfers its JPEG/PNG bytes to the worker, and immediately releases the canvas; OffscreenCanvas isn't reliable across all targets.
 - `pdfjs-dist` is used for rendering/previews; `pdfHelpers.ts` wires its worker via `?url` import and sets `cMapUrl` differently for web vs. Capacitor.
-- `tesseract.js` powers `PdfToTextTool` OCR. Matching worker/core assets and traineddata are staged into `public/tesseract/` by web and full-Android CI builds. `VITE_DISABLE_OCR=true` disables only Deep OCR in lite/F-Droid builds; PDF-to-Text Fast Scan and its route remain available, preserving the 22-tool catalog.
+- `tesseract.js` powers `PdfToTextTool` OCR. Matching worker/core assets and traineddata are staged into `public/tesseract/` by web and full-Android CI builds. `VITE_DISABLE_OCR=true` disables only Deep OCR in lite/F-Droid builds; PDF-to-Text Fast Scan and its route remain available, preserving the 23-tool catalog.
 - `vite.config.ts` `manualChunks` splits `pdf-lib`, `pdfjs-dist`, `tesseract.js`, and vendor UI libs into separate chunks — keep new heavy deps out of the main bundle by adding them here.
 
 ### Save / share abstraction
