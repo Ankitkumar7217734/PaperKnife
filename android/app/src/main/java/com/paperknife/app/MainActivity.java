@@ -39,8 +39,9 @@ public class MainActivity extends BridgeActivity {
         handleIntent(intent);
     }
 
+    // BridgeActivity declares onDestroy() as public; overrides cannot narrow visibility.
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         intentExecutor.shutdownNow();
         super.onDestroy();
     }
