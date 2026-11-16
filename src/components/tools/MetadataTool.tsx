@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
-import { Info, Lock, Edit3, Loader2, Sparkles, X } from 'lucide-react'
+import { Info, Lock, Edit3, Loader2, Sparkles, X, Image as ImageIcon, MapPin, ShieldCheck, AlertTriangle } from 'lucide-react'
 import { PDFDocument } from 'pdf-lib'
 import { toast } from 'sonner'
 
 import { getPdfMetaData, unlockPdf } from '../../utils/pdfHelpers'
 import { addActivity } from '../../utils/recentActivity'
 import { usePipeline } from '../../utils/pipelineContext'
+import { readImageMetadata, stripImageMetadata, reencodeImage, extFromBlob, kindLabel, type ImageMeta } from '../../utils/imageMetadata'
+import { useObjectURL } from '../../utils/useObjectURL'
 import SuccessState from './shared/SuccessState'
 import PrivacyBadge from './shared/PrivacyBadge'
 import { NativeToolLayout } from './shared/NativeToolLayout'
@@ -18,31 +20,40 @@ type MetadataPdfData = {
   currentMeta: { title?: string, author?: string, subject?: string, keywords?: string, creator?: string, producer?: string }
 }
 
+type ImageData = {
+  file: File
+  meta: ImageMeta
+}
+
 export default function MetadataTool() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { consumePipelineFile } = usePipeline()
+  const { createUrl, clearUrls } = useObjectURL()
   const [pdfData, setPdfData] = useState<MetadataPdfData | null>(null)
+  const [imageData, setImageData] = useState<ImageData | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
   const [customFileName, setCustomFileName] = useState('paperknife-metadata')
+  const [outputExt, setOutputExt] = useState('pdf')
   const [unlockPassword, setUnlockPassword] = useState('')
   const [isDeepCleaning, setIsDeepCleaning] = useState(false)
-  const [meta, setMeta] = useState({ 
-    title: '', 
-    author: localStorage.getItem('defaultAuthor') || '', 
-    subject: '', 
-    keywords: '', 
-    creator: localStorage.getItem('defaultAuthor') || '', 
-    producer: localStorage.getItem('defaultAuthor') || '' 
+  const [successMessage, setSuccessMessage] = useState('')
+  const [meta, setMeta] = useState({
+    title: '',
+    author: localStorage.getItem('defaultAuthor') || '',
+    subject: '',
+    keywords: '',
+    creator: localStorage.getItem('defaultAuthor') || '',
+    producer: localStorage.getItem('defaultAuthor') || ''
   })
 
   useEffect(() => {
     // Refresh meta if default author changes in storage (e.g. after first mount)
     const savedAuthor = localStorage.getItem('defaultAuthor') || ''
     if (!pdfData && savedAuthor) {
-      setMeta(prev => ({ 
-        ...prev, 
-        author: savedAuthor, 
+      setMeta(prev => ({
+        ...prev,
+        author: savedAuthor,
         creator: savedAuthor,
         producer: savedAuthor
       }))
@@ -52,7 +63,7 @@ export default function MetadataTool() {
   useEffect(() => {
     const pipelined = consumePipelineFile()
     if (pipelined) {
-      const file = new File([pipelined.buffer as any], pipelined.name, { type: 'application/pdf' })
+      const file = new File([pipelined.buffer as any], pipelined.name, { type: pipelined.type || 'application/pdf' })
       handleFile(file)
     }
   }, [])
@@ -71,28 +82,83 @@ export default function MetadataTool() {
     setIsProcessing(false)
   }
 
-  const handleFile = async (file: File) => {
-    if (file.type !== 'application/pdf') return
+  const handlePdfFile = async (file: File) => {
     setIsProcessing(true)
     try {
       const metaRes = await getPdfMetaData(file); let currentMeta = { title: '', author: '', subject: '', keywords: '', creator: '', producer: '' }
       if (!metaRes.isLocked) {
         const arrayBuffer = await file.arrayBuffer(); const pdfDoc = await PDFDocument.load(arrayBuffer)
-        
+
         // Load existing meta but prioritize non-empty settings if they exist
         const savedAuthor = localStorage.getItem('defaultAuthor') || ''
-        currentMeta = { 
-          title: pdfDoc.getTitle() || '', 
-          author: savedAuthor || pdfDoc.getAuthor() || '', 
-          subject: pdfDoc.getSubject() || '', 
-          keywords: pdfDoc.getKeywords() || '', 
-          creator: savedAuthor || pdfDoc.getCreator() || '', 
-          producer: savedAuthor || pdfDoc.getProducer() || '' 
+        currentMeta = {
+          title: pdfDoc.getTitle() || '',
+          author: savedAuthor || pdfDoc.getAuthor() || '',
+          subject: pdfDoc.getSubject() || '',
+          keywords: pdfDoc.getKeywords() || '',
+          creator: savedAuthor || pdfDoc.getCreator() || '',
+          producer: savedAuthor || pdfDoc.getProducer() || ''
         }
       }
+      setImageData(null)
       setPdfData({ file, pageCount: metaRes.pageCount, isLocked: metaRes.isLocked, currentMeta })
+      setOutputExt('pdf')
       setMeta(currentMeta); setCustomFileName(`${file.name.replace('.pdf', '')}-metadata`)
     } catch (err) { console.error(err) } finally { setIsProcessing(false); setDownloadUrl(null) }
+  }
+
+  const handleImageFile = async (file: File) => {
+    setIsProcessing(true)
+    try {
+      const meta = await readImageMetadata(file)
+      setPdfData(null)
+      setImageData({ file, meta })
+      const base = file.name.replace(/\.[^.]+$/, '')
+      const ext = file.name.toLowerCase().split('.').pop() || 'jpg'
+      setOutputExt(ext)
+      setCustomFileName(`${base}-clean`)
+    } catch (err) {
+      console.error(err)
+      toast.error('Could not read this image file')
+      setImageData(null)
+    } finally { setIsProcessing(false); setDownloadUrl(null) }
+  }
+
+  const handleFile = async (file: File) => {
+    if (file.type === 'application/pdf') return handlePdfFile(file)
+    if (file.type.startsWith('image/')) return handleImageFile(file)
+    toast.error('Please pick a PDF or an image (JPG, PNG, WebP, GIF…) file')
+  }
+
+  const cleanImage = async () => {
+    if (!imageData) return
+    setIsProcessing(true); setIsDeepCleaning(true)
+    await new Promise(resolve => setTimeout(resolve, 300))
+    try {
+      const result = await stripImageMetadata(imageData.file)
+      let blob: Blob | null = null
+      if (result.status === 'stripped') {
+        blob = result.blob
+      } else {
+        // Format has no lossless stripper — re-encode through canvas instead.
+        blob = await reencodeImage(imageData.file)
+      }
+      if (!blob) {
+        toast.error("This format can't be cleaned on this device — try JPG, PNG, WebP, or GIF")
+        return
+      }
+      const ext = extFromBlob(blob, imageData.file)
+      const url = createUrl(blob)
+      setOutputExt(ext)
+      setSuccessMessage('Metadata Removed!')
+      setDownloadUrl(url)
+      addActivity({ name: `${customFileName}.${ext}`, tool: 'Metadata', size: blob.size, resultUrl: url })
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`)
+    } finally {
+      setIsProcessing(false)
+      setIsDeepCleaning(false)
+    }
   }
 
   const saveMetadata = async (deepClean = false) => {
@@ -103,26 +169,26 @@ export default function MetadataTool() {
       const arrayBuffer = await pdfData.file.arrayBuffer()
       const sourcePdf = await PDFDocument.load(arrayBuffer, { password: pdfData.password || undefined, ignoreEncryption: true } as any)
       let targetPdf: PDFDocument
-      
+
       if (deepClean) {
         targetPdf = await PDFDocument.create()
         const copiedPages = await targetPdf.copyPages(sourcePdf, sourcePdf.getPageIndices())
         copiedPages.forEach(page => targetPdf.addPage(page))
-        
+
         targetPdf.setTitle('')
         targetPdf.setAuthor('')
         targetPdf.setSubject('')
         targetPdf.setKeywords([])
         targetPdf.setCreator(' ')
         targetPdf.setProducer(' ')
-        
+
         targetPdf.setModificationDate(new Date())
         targetPdf.setCreationDate(new Date())
-        
+
         const dict = targetPdf.catalog.get(targetPdf.context.obj('Metadata'))
         if (dict) targetPdf.catalog.delete(targetPdf.context.obj('Metadata'))
-      } else { 
-        targetPdf = sourcePdf 
+      } else {
+        targetPdf = sourcePdf
         targetPdf.setTitle(meta.title || '')
         targetPdf.setAuthor(meta.author || '')
         targetPdf.setSubject(meta.subject || '')
@@ -130,18 +196,27 @@ export default function MetadataTool() {
         targetPdf.setCreator(meta.creator || ' ')
         targetPdf.setProducer(meta.producer || ' ')
       }
-      
+
       const pdfBytes = await targetPdf.save();
       const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
+      setSuccessMessage(deepClean ? 'Deep Clean Successful!' : 'Metadata Updated!')
       setDownloadUrl(url)
       addActivity({ name: `${customFileName}.pdf`, tool: 'Metadata', size: blob.size, resultUrl: url })
-    } catch (error: any) { 
-      toast.error(`Error: ${error.message}`) 
-    } finally { 
-      setIsProcessing(false); 
-      setIsDeepCleaning(false) 
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`)
+    } finally {
+      setIsProcessing(false);
+      setIsDeepCleaning(false)
     }
+  }
+
+  const startOver = () => {
+    clearUrls()
+    setDownloadUrl(null)
+    setPdfData(null)
+    setImageData(null)
+    setSuccessMessage('')
   }
 
   const ActionButtons = () => (
@@ -155,16 +230,22 @@ export default function MetadataTool() {
     </div>
   )
 
+  const ImageActionButtons = () => (
+    <button onClick={cleanImage} disabled={isProcessing} className={`w-full bg-emerald-500 text-white font-black uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50 py-4 rounded-2xl text-sm md:p-6 md:rounded-3xl md:text-xl flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/20`}>
+      {isDeepCleaning ? <Loader2 className="animate-spin" /> : <Sparkles size={18} />} Remove Metadata
+    </button>
+  )
+
   return (
-    <NativeToolLayout title="Metadata Editor" description="Edit or wipe document properties for better privacy." actions={pdfData && !pdfData.isLocked && !downloadUrl && <ActionButtons />}>
-      <input type="file" accept=".pdf" className="hidden" ref={fileInputRef} onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-      {!pdfData ? (
+    <NativeToolLayout title="Metadata Editor" description="Edit or wipe document properties for better privacy." actions={(pdfData && !pdfData.isLocked && !downloadUrl && <ActionButtons />) || (imageData && !downloadUrl && <ImageActionButtons />)}>
+      <input type="file" accept=".pdf,image/*" className="hidden" ref={fileInputRef} onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+      {!pdfData && !imageData ? (
         <div onClick={() => !isProcessing && fileInputRef.current?.click()} className="border-4 border-dashed border-pk-border dark:border-zinc-900 rounded-[2.5rem] p-12 text-center hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all cursor-pointer group">
           <div className="w-20 h-20 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"><Edit3 size={32} /></div>
-          <h3 className="text-xl font-bold dark:text-white mb-2">Select PDF</h3>
-          <p className="text-sm text-gray-400">Tap to start editing metadata</p>
+          <h3 className="text-xl font-bold dark:text-white mb-2">Select PDF or Image</h3>
+          <p className="text-sm text-gray-400">Tap to view or wipe metadata</p>
         </div>
-      ) : pdfData.isLocked ? (
+      ) : pdfData?.isLocked ? (
         <div className="max-w-md mx-auto relative z-[100]">
           <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2.5rem] border border-pk-border dark:border-white/5 text-center shadow-2xl">
             <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/30 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6"><Lock size={32} /></div>
@@ -173,13 +254,77 @@ export default function MetadataTool() {
             <button onClick={handleUnlock} disabled={!unlockPassword || isProcessing} className="w-full bg-rose-500 text-white p-4 rounded-2xl font-black uppercase text-xs">Unlock</button>
           </div>
         </div>
+      ) : imageData ? (
+        <div className="space-y-6">
+          <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-3xl border border-pk-border dark:border-white/5 flex items-center gap-6 shadow-sm">
+            <div className="w-16 h-16 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-500 rounded-2xl flex items-center justify-center shrink-0"><ImageIcon size={24} /></div>
+            <div className="flex-1 min-w-0 text-left">
+              <h3 className="font-bold text-sm truncate dark:text-white">{imageData.file.name}</h3>
+              <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest">{kindLabel(imageData.meta.kind)} • {(imageData.file.size / (1024*1024)).toFixed(1)} MB</p>
+            </div>
+            <button onClick={startOver} className="p-2 text-gray-400 hover:text-rose-500 transition-colors"><X size={20} /></button>
+          </div>
+          <div className="bg-pk-surface dark:bg-zinc-900 p-8 rounded-[2rem] border border-pk-border dark:border-white/5 space-y-6 shadow-sm">
+            {!downloadUrl ? (
+              <div className="space-y-6">
+                {imageData.meta.hasGps && (
+                  <div className="flex items-start gap-3 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/40 rounded-2xl p-4">
+                    <MapPin className="text-rose-500 shrink-0 mt-0.5" size={18} />
+                    <p className="text-xs font-bold text-rose-600 dark:text-rose-400">GPS location found — removing metadata strips it from the file.</p>
+                  </div>
+                )}
+                {imageData.meta.total === 0 ? (
+                  <div className="text-center py-10">
+                    <ShieldCheck className="text-emerald-500 mx-auto mb-4" size={36} />
+                    <p className="text-sm font-bold dark:text-white">No metadata found</p>
+                    <p className="text-xs text-gray-400 mt-1">This file is already clean — nothing to remove.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    {imageData.meta.sections.map(section => (
+                      <div key={section.label}>
+                        <p className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 px-1">{section.label}</p>
+                        <div className="bg-pk-surface-muted dark:bg-zinc-950 rounded-2xl divide-y divide-black/5 dark:divide-white/5">
+                          {section.entries.map(entry => (
+                            <div key={entry.label} className="flex items-start justify-between gap-4 px-4 py-2.5">
+                              <span className="text-xs font-bold text-gray-400 flex items-center gap-1.5 shrink-0">
+                                {entry.sensitive && <AlertTriangle size={11} className="text-amber-500 shrink-0" />}
+                                {entry.label}
+                              </span>
+                              <span className="text-xs font-bold dark:text-white text-right break-all max-w-[60%]">{entry.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    {imageData.meta.orientation !== 1 && (
+                      <p className="text-[11px] text-gray-400 px-1 flex items-start gap-2"><Info size={13} className="shrink-0 mt-0.5" />Orientation data will be removed — some apps may display the cleaned image rotated differently.</p>
+                    )}
+                  </div>
+                )}
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 px-1">Output Filename</label>
+                  <input
+                    type="text"
+                    value={customFileName}
+                    onChange={(e) => setCustomFileName(e.target.value)}
+                    className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white"
+                  />
+                </div>
+              </div>
+            ) : (
+              <SuccessState message={successMessage} downloadUrl={downloadUrl} fileName={`${customFileName}.${outputExt}`} onStartOver={startOver} showPreview={false} />
+            )}
+            <button onClick={startOver} className="w-full py-2 text-[10px] font-black uppercase text-gray-300 hover:text-rose-500 transition-colors">Close File</button>
+          </div>
+        </div>
       ) : (
         <div className="space-y-6">
           <div className="bg-pk-surface dark:bg-zinc-900 p-6 rounded-3xl border border-pk-border dark:border-white/5 flex items-center gap-6 shadow-sm">
             <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-2xl flex items-center justify-center shrink-0"><Info size={24} /></div>
             <div className="flex-1 min-w-0 text-left">
-              <h3 className="font-bold text-sm truncate dark:text-white">{pdfData.file.name}</h3>
-              <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest">{pdfData.pageCount} Pages • {(pdfData.file.size / (1024*1024)).toFixed(1)} MB</p>
+              <h3 className="font-bold text-sm truncate dark:text-white">{pdfData!.file.name}</h3>
+              <p className="text-[10px] text-gray-400 uppercase font-black tracking-widest">{pdfData!.pageCount} Pages • {(pdfData!.file.size / (1024*1024)).toFixed(1)} MB</p>
             </div>
             <button onClick={() => setPdfData(null)} className="p-2 text-gray-400 hover:text-rose-500 transition-colors"><X size={20} /></button>
           </div>
@@ -188,11 +333,11 @@ export default function MetadataTool() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 px-1">Output Filename</label>
-                  <input 
-                    type="text" 
-                    value={customFileName} 
-                    onChange={(e) => setCustomFileName(e.target.value)} 
-                    className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white" 
+                  <input
+                    type="text"
+                    value={customFileName}
+                    onChange={(e) => setCustomFileName(e.target.value)}
+                    className="w-full bg-pk-surface-muted dark:bg-zinc-950 rounded-xl px-4 py-3 border border-transparent focus:border-rose-500 outline-none font-bold text-sm dark:text-white"
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -205,7 +350,7 @@ export default function MetadataTool() {
                 </div>
               </div>
             ) : (
-              <SuccessState message={isDeepCleaning ? "Deep Clean Successful!" : "Metadata Updated!"} downloadUrl={downloadUrl} fileName={`${customFileName}.pdf`} onStartOver={() => { setDownloadUrl(null); setPdfData(null); }} />
+              <SuccessState message={successMessage} downloadUrl={downloadUrl} fileName={`${customFileName}.pdf`} onStartOver={() => { setDownloadUrl(null); setPdfData(null); }} />
             )}
             <button onClick={() => setPdfData(null)} className="w-full py-2 text-[10px] font-black uppercase text-gray-300 hover:text-rose-500 transition-colors">Close File</button>
           </div>

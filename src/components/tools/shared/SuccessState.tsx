@@ -15,6 +15,12 @@ function mimeFromName(name: string): string {
     case 'jpeg': return 'image/jpeg'
     case 'webp': return 'image/webp'
     case 'gif': return 'image/gif'
+    case 'bmp': return 'image/bmp'
+    case 'tif':
+    case 'tiff': return 'image/tiff'
+    case 'heic':
+    case 'heif': return 'image/heic'
+    case 'avif': return 'image/avif'
     case 'txt': return 'text/plain'
     case 'md':
     case 'markdown': return 'text/markdown'

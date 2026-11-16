@@ -159,7 +159,7 @@ export default function WebView({ tools }: { tools: Tool[] }) {
             <kbd className="hidden md:flex absolute right-5 inset-y-0 my-auto h-7 items-center px-2.5 rounded-lg border border-pk-border dark:border-zinc-700 text-[10px] font-black text-stone-300 dark:text-zinc-600 pointer-events-none">/</kbd>
           </div>
           <p className="hidden md:flex items-center justify-center gap-2 mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 dark:text-zinc-600">
-            <DropHintIcon size={14} className="text-rose-400" /> or drop a PDF anywhere on this page
+            <DropHintIcon size={14} className="text-rose-400" /> or drop a PDF or image anywhere on this page
           </p>
         </div>
       </section>

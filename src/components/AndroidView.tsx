@@ -54,12 +54,12 @@ export default function AndroidView({ tools, theme, toggleTheme, onFileSelect }:
 
   return (
     <div className="flex flex-col min-h-screen bg-pk-canvas pb-44 text-left">
-      <input 
-        type="file" 
-        accept=".pdf" 
-        ref={fileInputRef} 
-        onChange={handleFileChange} 
-        className="hidden" 
+      <input
+        type="file"
+        accept=".pdf,application/pdf,image/*"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
       />
       
       {/* Minimal Header */}
@@ -106,7 +106,7 @@ export default function AndroidView({ tools, theme, toggleTheme, onFileSelect }:
                     </div>
                  </div>
                  <div>
-                    <h2 className="text-3xl font-black text-white dark:text-black tracking-tight leading-none mb-2">Select PDF</h2>
+                    <h2 className="text-3xl font-black text-white dark:text-black tracking-tight leading-none mb-2">Select PDF or Image</h2>
                     <p className="text-[11px] font-bold text-zinc-400 dark:text-zinc-600 uppercase tracking-tight">Tap to load from device storage</p>
                  </div>
               </div>

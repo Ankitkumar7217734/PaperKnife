@@ -60,28 +60,50 @@ public class MainActivity extends BridgeActivity {
         String displayName = getDisplayName(sourceUri);
         String mimeType = intent.getType();
         if (mimeType == null) mimeType = getContentResolver().getType(sourceUri);
+        String lowerName = displayName.toLowerCase(Locale.ROOT);
         boolean isPdf = "application/pdf".equalsIgnoreCase(mimeType)
             || "application/x-pdf".equalsIgnoreCase(mimeType)
-            || displayName.toLowerCase(Locale.ROOT).endsWith(".pdf");
-        if (!isPdf) return;
+            || lowerName.endsWith(".pdf");
+        boolean isImage = (mimeType != null && mimeType.toLowerCase(Locale.ROOT).startsWith("image/"))
+            || lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")
+            || lowerName.endsWith(".png") || lowerName.endsWith(".webp")
+            || lowerName.endsWith(".gif") || lowerName.endsWith(".heic")
+            || lowerName.endsWith(".heif") || lowerName.endsWith(".tif")
+            || lowerName.endsWith(".tiff") || lowerName.endsWith(".bmp")
+            || lowerName.endsWith(".avif");
+        if (!isPdf && !isImage) return;
 
         // Consume the Intent before background I/O so onResume cannot import it twice.
         intent.setAction(null);
         intent.removeExtra(Intent.EXTRA_STREAM);
 
-        final String finalDisplayName = displayName.toLowerCase(Locale.ROOT).endsWith(".pdf")
-            ? displayName
-            : displayName + ".pdf";
+        // Keep the shared file's identity intact so the WebView can derive its type.
+        String fallbackExtension = isImage ? ".jpg" : ".pdf";
+        final String finalDisplayName = hasFileExtension(lowerName) ? displayName : displayName + fallbackExtension;
         intentExecutor.execute(() -> {
             File cachedFile = null;
             try {
-                cachedFile = copyToPrivateCache(sourceUri);
+                cachedFile = copyToPrivateCache(sourceUri, finalDisplayName);
                 dispatchFileIntent(cachedFile.getAbsolutePath(), finalDisplayName, 0);
             } catch (Exception error) {
                 if (cachedFile != null) cachedFile.delete();
-                android.util.Log.e("PaperKnife", "Unable to import shared PDF", error);
+                android.util.Log.e("PaperKnife", "Unable to import shared file", error);
             }
         });
+    }
+
+    private boolean hasFileExtension(String lowerName) {
+        int dot = lowerName.lastIndexOf('.');
+        if (dot <= 0 || dot == lowerName.length() - 1) return false;
+        // Reject names whose "extension" is not a short alphanumeric suffix (e.g. "my.photo").
+        String ext = lowerName.substring(dot + 1);
+        if (ext.length() > 5) return false;
+        for (int i = 0; i < ext.length(); i++) {
+            char c = ext.charAt(i);
+            boolean ok = (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
+            if (!ok) return false;
+        }
+        return true;
     }
 
     @SuppressWarnings("deprecation")
@@ -105,19 +127,24 @@ public class MainActivity extends BridgeActivity {
         }
 
         String lastSegment = uri.getLastPathSegment();
-        return lastSegment == null || lastSegment.trim().isEmpty() ? "imported-file.pdf" : lastSegment;
+        return lastSegment == null || lastSegment.trim().isEmpty() ? "imported-file" : lastSegment;
     }
 
-    private File copyToPrivateCache(Uri sourceUri) throws IOException {
+    private File copyToPrivateCache(Uri sourceUri, String displayName) throws IOException {
         File importDirectory = new File(getCacheDir(), "imports");
         if (!importDirectory.exists() && !importDirectory.mkdirs()) {
             throw new IOException("Could not create the import cache directory.");
         }
 
-        File target = File.createTempFile("paperknife-import-", ".pdf", importDirectory);
+        String lowerName = displayName.toLowerCase(Locale.ROOT);
+        int dot = lowerName.lastIndexOf('.');
+        String suffix = dot > 0 && dot < lowerName.length() - 1 && lowerName.length() - dot <= 6
+            ? lowerName.substring(dot)  // keep the shared file's extension (e.g. ".jpg")
+            : ".bin";
+        File target = File.createTempFile("paperknife-import-", suffix, importDirectory);
         try (InputStream input = getContentResolver().openInputStream(sourceUri);
              OutputStream output = new FileOutputStream(target)) {
-            if (input == null) throw new IOException("The selected PDF could not be opened.");
+            if (input == null) throw new IOException("The selected file could not be opened.");
             byte[] buffer = new byte[64 * 1024];
             int count;
             while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);

@@ -23,6 +23,7 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import { Theme, ViewMode, Tool } from './types'
 import Layout from './components/Layout'
 import { PipelineProvider, usePipeline } from './utils/pipelineContext'
+import { mimeFromFileName } from './utils/pdfHelpers'
 import { ViewModeProvider } from './utils/viewModeContext'
 import { clearActivity, updateLastSeen, getLastSeen } from './utils/recentActivity'
 import { hapticSelection } from './utils/haptics'
@@ -77,7 +78,7 @@ const tools: ToolDefinition[] = [
   { title: 'Rearrange PDF', desc: 'Drag and drop pages to reorder them.', icon: ArrowUpDown, implemented: true, path: '/rearrange-pdf', category: 'Edit', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', component: RearrangeTool },
   { title: 'Page Numbers', desc: 'Add numbering to your documents automatically.', icon: Hash, implemented: true, path: '/page-numbers', category: 'Edit', color: 'text-sky-500', bg: 'bg-sky-50 dark:bg-sky-900/20', component: PageNumberTool },
   { title: 'Watermark', desc: 'Overlay custom text for branding or security.', icon: Type, implemented: true, path: '/watermark', category: 'Edit', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20', component: WatermarkTool },
-  { title: 'Metadata', desc: 'Edit document properties for better privacy.', icon: Tags, implemented: true, path: '/metadata', category: 'Secure', color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-900/20', component: MetadataTool },
+  { title: 'Metadata', desc: 'View and wipe metadata in PDFs & images — GPS, EXIF, and more.', icon: Tags, implemented: true, path: '/metadata', category: 'Secure', color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-900/20', component: MetadataTool },
   { title: 'Signature', desc: 'Add your electronic signature to any document.', icon: PenTool, implemented: true, path: '/signature', category: 'Edit', color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-900/20', component: SignatureTool },
   { title: 'Grayscale', desc: 'Convert all document pages to black and white.', icon: Palette, implemented: true, path: '/grayscale', category: 'Optimize', color: 'text-zinc-500', bg: 'bg-zinc-50 dark:bg-zinc-900/20', component: GrayscaleTool },
   { title: 'PDF to Image', desc: 'Convert document pages into high-quality images.', icon: FileImage, implemented: true, path: '/pdf-to-image', category: 'Convert', color: 'text-lime-500', bg: 'bg-lime-50 dark:bg-lime-900/20', component: PdfToImageTool },
@@ -134,13 +135,17 @@ const runThemeTransition = (apply: () => void) => {
   doc.startViewTransition(apply)
 }
 
+const IMAGE_TOOL_PATHS = new Set(['/metadata', '/compress-image', '/increase-image', '/image-to-pdf'])
+
 function QuickDropModal({ file, onClear, onBack }: { file: File, onClear: () => void, onBack?: () => void }) {
   const navigate = useNavigate()
   const { setPipelineFile } = usePipeline()
   const [showMore, setShowMore] = useState(false)
-  
-  const essentials = activeTools.slice(0, 4)
-  const otherTools = activeTools.slice(4)
+  const isImage = file.type.startsWith('image/')
+
+  const relevantTools = isImage ? activeTools.filter(tool => IMAGE_TOOL_PATHS.has(tool.path || '')) : activeTools
+  const essentials = relevantTools.slice(0, 4)
+  const otherTools = relevantTools.slice(4)
 
   const handleAction = async (path: string, title: string) => {
     toast.loading(`Importing ${file.name}...`, { id: 'quick-load' })
@@ -175,11 +180,11 @@ function QuickDropModal({ file, onClear, onBack }: { file: File, onClear: () => 
                   </button>
                 )}
                 <div className="w-10 h-10 bg-rose-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
-                   <FileText size={20} />
+                   {isImage ? <FileImage size={20} /> : <FileText size={20} />}
                 </div>
                 <div className="min-w-0">
                    <h3 className="text-lg font-black dark:text-white truncate max-w-[200px] leading-none mb-1">{file.name}</h3>
-                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{(file.size / (1024*1024)).toFixed(2)} MB • PDF Document</p>
+                   <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{(file.size / (1024*1024)).toFixed(2)} MB • {isImage ? 'Image' : 'PDF Document'}</p>
                 </div>
              </div>
              <button onClick={onClear} className="p-2 bg-gray-100 dark:bg-zinc-900 rounded-full text-gray-400 hover:text-rose-500 transition-colors"><X size={18}/></button>
@@ -311,18 +316,19 @@ function App() {
         let blob: Blob
         try {
           const response = await fetch(Capacitor.convertFileSrc(uri))
-          if (!response.ok) throw new Error(`Could not read imported PDF (${response.status})`)
+          if (!response.ok) throw new Error(`Could not read imported file (${response.status})`)
           blob = await response.blob()
         } catch {
           const fileContent = await Filesystem.readFile({ path: uri })
           blob = typeof fileContent.data === 'string'
-            ? await (await fetch(`data:application/pdf;base64,${fileContent.data.includes(',') ? fileContent.data.split(',').pop() : fileContent.data}`)).blob()
+            ? await (await fetch(`data:;base64,${fileContent.data.includes(',') ? fileContent.data.split(',').pop() : fileContent.data}`)).blob()
             : fileContent.data
         }
-        const requestedName = name || uri.split('/').pop() || 'imported-file.pdf'
-        const fileName = requestedName.toLowerCase().endsWith('.pdf') ? requestedName : `${requestedName}.pdf`
-        setDroppedFile(new File([blob], fileName, { type: 'application/pdf' }))
-        setShowQuickDrop(false)
+        const requestedName = name || uri.split('/').pop() || 'imported-file'
+        const type = mimeFromFileName(requestedName)
+        setDroppedFile(new File([blob], requestedName, { type }))
+        // Images skip the PDF-only preview and open the tool picker directly.
+        setShowQuickDrop(type.startsWith('image/'))
         toast.success('File imported successfully!', { id: 'intent-load' })
       } catch (error) {
         console.error('Intent load error:', error)
@@ -367,12 +373,14 @@ function App() {
 
   const handleGlobalDrop = (files: FileList) => {
     const file = files[0]
-    if (!file || (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf'))) {
-      toast.error('Please drop a valid PDF file.')
+    const isPdf = !!file && (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))
+    const isImage = !!file && file.type.startsWith('image/')
+    if (!file || (!isPdf && !isImage)) {
+      toast.error('Please drop a valid PDF or image file.')
       return
     }
     setDroppedFile(file)
-    setShowQuickDrop(false) // Show preview first
+    setShowQuickDrop(isImage) // PDFs show the preview first; images go straight to the tool picker
   }
 
   return (

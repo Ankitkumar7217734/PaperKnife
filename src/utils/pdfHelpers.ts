@@ -103,6 +103,34 @@ export const downloadFile = async (data: Uint8Array | string, fileName: string, 
 /**
  * Universal file sharer
  */
+/**
+ * Derives a MIME type from a filename's extension. Used for files that arrive
+ * without a type (e.g. Android intent imports), where the cached name is the
+ * only reliable identity.
+ */
+export const mimeFromFileName = (name: string): string => {
+  const ext = name.toLowerCase().split('.').pop() || ''
+  switch (ext) {
+    case 'pdf': return 'application/pdf'
+    case 'zip': return 'application/zip'
+    case 'png': return 'image/png'
+    case 'jpg':
+    case 'jpeg': return 'image/jpeg'
+    case 'webp': return 'image/webp'
+    case 'gif': return 'image/gif'
+    case 'bmp': return 'image/bmp'
+    case 'tif':
+    case 'tiff': return 'image/tiff'
+    case 'heic':
+    case 'heif': return 'image/heic'
+    case 'avif': return 'image/avif'
+    case 'txt': return 'text/plain'
+    case 'md':
+    case 'markdown': return 'text/markdown'
+    default: return 'application/octet-stream'
+  }
+}
+
 export const shareFile = async (data: Uint8Array | string, fileName: string, mimeType: string) => {
   if (Capacitor.isNativePlatform()) {
     try {
@@ -132,7 +160,7 @@ export const shareFile = async (data: Uint8Array | string, fileName: string, mim
         title: fileName,
         text: `Shared via PaperKnife`,
         url: result.uri,
-        dialogTitle: 'Share PDF'
+        dialogTitle: mimeType.startsWith('image/') ? 'Share Image' : 'Share PDF'
       });
       
       return true;
