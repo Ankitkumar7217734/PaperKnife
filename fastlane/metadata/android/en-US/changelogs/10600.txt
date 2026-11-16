@@ -1,0 +1,1 @@
+Metadata tool now works with images: view and remove GPS location and EXIF data. Share or open images from other apps into PaperKnife.
